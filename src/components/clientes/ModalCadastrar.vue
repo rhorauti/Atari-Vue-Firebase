@@ -6,7 +6,7 @@
                     has-background-light
                     ">
             <div class="is-flex has-background-info-dark has-text-light is-justify-content-space-between pl-3 py-1 mb-2">
-                <h1 class="is-size-5 has-text-weight-semibold">Cadastro de Novo Cliente</h1>
+                <h1 class="is-size-5 has-text-weight-semibold">Cadastros de Novo Cliente</h1>
                 <button @click="FecharModalCadastrar()" class="has-background-danger has-text-light has-text-weight-semibold delete is-medium mr-2 mt-1" aria-label="close" id="btnFecharModalCadastrar">X</button>
             </div>
             <div class="columns is-gapless">
