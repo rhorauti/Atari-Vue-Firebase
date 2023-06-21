@@ -1,6 +1,6 @@
 <template>
     
-    <div class="has-text-danger">Rota Fornecedores</div>
+    <div class="has-text-danger">Rota Fornecedores teste</div>
 
 </template>
 
