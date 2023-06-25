@@ -1,57 +1,54 @@
 <template>
  
-    <div v-if="this.notificationAdicionar" class="notification has-background-primary is-flex " style="padding: 0.2rem !important; margin-bottom: 0.4rem !important;">
+    <div v-if="props.notificationAdicionar" class="notification has-background-primary is-flex " style="padding: 0.2rem !important; margin-bottom: 0.4rem !important;">
         <div class="is flex mb-1">
             <font-awesome-icon :icon="['fas', 'circle-check']" class="has-text-light mt-2 ml-3"/>
             <span class="has-text-light ml-3">Item adicionado com sucesso!</span>
         </div>
-        <button class="delete" @click="FecharNotificationAdicionar()"></button>
+        <button class="delete" @click="fecharNotificationAdicionar()"></button>
     </div>
 
-    <div v-if="this.notificationAlterar" class="notification has-background-primary is-flex " style="padding: 0.2rem !important; margin-bottom: 0.4rem !important;">
+    <div v-if="props.notificationAlterar" class="notification has-background-primary is-flex " style="padding: 0.2rem !important; margin-bottom: 0.4rem !important;">
         <div class="is flex mb-1">
             <font-awesome-icon :icon="['fas', 'circle-check']" class="has-text-light mt-2 ml-3"/>
             <span class="has-text-light ml-3">Item alterado com sucesso!</span>
         </div>
-        <button class="delete" @click="FecharNotificationAlterar()"></button>
+        <button class="delete" @click="fecharNotificationAlterar()"></button>
     </div>
 
-    <div v-if="this.notificationExcluir" class="notification has-background-primary is-flex " style="padding: 0.2rem !important; margin-bottom: 0.4rem !important;">
+    <div v-if="props.notificationExcluir" class="notification has-background-primary is-flex " style="padding: 0.2rem !important; margin-bottom: 0.4rem !important;">
         <div class="is flex mb-1">
             <font-awesome-icon :icon="['fas', 'circle-check']" class="has-text-light mt-2 ml-3"/>
             <span class="has-text-light ml-3">Item excluido com sucesso!</span>
         </div>
-        <button class="delete" @click="FecharNotificationExcluir()"></button>
+        <button class="delete" @click="fecharNotificationExcluir()"></button>
     </div>
 
 </template>
 
-<script>
+<script setup>
 
-    const notificationMessage = {
-        name: 'NotificationMessage',
-        props: {
-            notificationExcluir: Boolean,
-            notificationAlterar: Boolean,
-            notificationAdicionar: Boolean
-        },
+    import { defineProps, defineEmits } from 'vue'    
 
-        methods: {
-            FecharNotificationAdicionar() {
-                this.$emit('FecharNotificationAdicionar')
-            },
+    const props = defineProps({
+        notificationExcluir: Boolean,
+        notificationAlterar: Boolean,
+        notificationAdicionar: Boolean
+    }) 
 
-            FecharNotificationAlterar() {
-                this.$emit('FecharNotificationAlterar')
-            },
+    const emit = defineEmits(['fecharNotificationAdicionar', 'fecharNotificationAdicionar', 'fecharNotificationExcluir'])
 
-            FecharNotificationExcluir() {
-                this.$emit('FecharNotificationExcluir')
-            }
-        }
-    }
+    const fecharNotificationAdicionar = () => {
+            emit('fecharNotificationAdicionar')
+    };
 
-    export default notificationMessage
+    const fecharNotificationAlterar = () => {
+        emit('fecharNotificationAlterar')
+    };
+
+    const fecharNotificationExcluir = () => {
+            emit('fecharNotificationExcluir')
+    };
 
 </script>
 

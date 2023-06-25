@@ -1,6 +1,6 @@
 <template>
 
-<div v-if="this.mostrarPopupAlterar" class="modal is-active" id="modal-popup-alterar">
+<div v-if="props.mostrarPopupAlterar" class="modal is-active" id="modal-popup-alterar">
         <div class="modal-background"></div>
         <div class="modal-content has-background-light" style="width: 40rem !important;">
             <div class="is-flex is-flex-direction-column is-justify-content-center is-align-content-center m-3">
@@ -59,8 +59,8 @@
                 
         
                 <footer class="is-flex is-justify-content-center mt-3">
-                    <button @click="AlterarRegistro()" class="button is-danger is-small has-text-weight-bold mr-2" id="btn-Alterar-sim">Alterar</button>
-                    <button @click="FecharPopupAlterar()" class="button is-warning is-small has-text-weight-bold" id="btn-Alterar-nao">Cancelar</button>
+                    <button @click="alterarRegistro()" class="button is-danger is-small has-text-weight-bold mr-2" id="btn-Alterar-sim">Alterar</button>
+                    <button @click="fecharPopupAlterar()" class="button is-warning is-small has-text-weight-bold" id="btn-Alterar-nao">Cancelar</button>
                 </footer>   
             </div>   
         </div>
@@ -68,55 +68,49 @@
 
 </template>
 
-<script>
+<script setup>
 
     import { updateDoc, doc } from 'firebase/firestore'
     import { db } from '@/firebase'
+    import { defineProps, defineEmits } from 'vue'
 
-    const popUpAlterar = {
+    const props = defineProps({
+        mostrarPopupAlterar: Boolean,
+        id: String,
+        nome: String,
+        tipo: String,
+        cnpj: String,
+        email: String,
+        telefone: String,
+        endereco: String,
+        bairro: String,
+        cidade: String,
+        uf: String
+    });
 
-        name: 'PopUpAlterar',
+    const emit = defineEmits(['emitirNotificationAlterar', 'fecharModalEditar', 'fecharPopupAlterar'])
 
-        props: {
-            mostrarPopupAlterar: Boolean,
-            id: String,
-            nome: String,
-            tipo: String,
-            cnpj: String,
-            email: String,
-            telefone: String,
-            endereco: String,
-            bairro: String,
-            cidade: String,
-            uf: String
-        },
-
-        methods: {
-            async AlterarRegistro() {
-                this.$emit('EmitirNotificationAlterar')
-                const docRef = doc(db, 'clientes', this.id)
-                await updateDoc(docRef, {
-                    nome: this.nome,
-                    tipo: this.tipo,
-                    cnpj: this.cnpj,
-                    email: this.email,
-                    telefone: this.telefone,
-                    endereco: this.endereco,
-                    bairro: this.bairro, 
-                    cidade: this.cidade,
-                    uf: this.uf
-                })
-                .then(this.FecharPopupAlterar())
-                .then(this.$emit('FecharModalEditar'))
-            },
+    const alterarRegistro = async () => {
+            emit('emitirNotificationAlterar')
+            const docRef = doc(db, 'clientes',props.id)
+            await updateDoc(docRef, {
+                nome: props.nome,
+                tipo: props.tipo,
+                cnpj: props.cnpj,
+                email: props.email,
+                telefone: props.telefone,
+                endereco: props.endereco,
+                bairro: props.bairro, 
+                cidade: props.cidade,
+                uf: props.uf
+            })
+            .then(fecharPopupAlterar())
+            .then(emit('fecharModalEditar'))
+        };
             
-            FecharPopupAlterar() {
-                this.$emit('FecharPopupAlterar')
-            }
-        }
-    }
-
-    export default popUpAlterar
+    const fecharPopupAlterar = () => {
+        emit('fecharPopupAlterar')
+    };
 
 </script>
 

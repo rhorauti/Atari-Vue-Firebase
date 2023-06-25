@@ -1,13 +1,13 @@
 <template>
 
-    <div v-if="this.mostrarModalAlterar" class="modal is-active" id="modalEditar">
+    <div v-if="props.mostrarModalAlterar" class="modal is-active" id="modalEditar">
         <div class="modal-background"></div>
         <div class="modal-content 
                     has-background-light
                     ">
             <div class="is-flex has-background-info-dark has-text-light is-justify-content-space-between pl-3 py-1 mb-2">
                 <h1 class="is-size-5 has-text-weight-semibold">Alteração de Registro de Cliente</h1>
-                <button @click="FecharModalEditar()" class="has-background-danger has-text-light has-text-weight-semibold delete is-medium mr-2 mt-1" aria-label="close" id="btnFecharModalEditar">X</button>
+                <button @click="fecharModalEditar()" class="has-background-danger has-text-light has-text-weight-semibold delete is-medium mr-2 mt-1" aria-label="close" id="btnFecharModalEditar">X</button>
             </div>
             <div class="columns is-gapless">
                 <div class="column">
@@ -26,14 +26,14 @@
                     <!--Tipo de cliente-->
                     <label for="cliente-tipo-modal-editar" class="label is-small ml-3 mb-1">Tipo</label>
                     <div class="mb-2 ml-3 mr-3 "> 
-                        <select :value="this.tipo" @change="$emit('update:tipo', $event.target.value)" class="select is-info is-small is-hovered" id="cliente-tipo-modal-editar">
+                        <select :value="props.tipo" @change="$emit('update:tipo', $event.target.value)" class="select is-info is-small is-hovered" id="cliente-tipo-modal-editar">
                             <option v-for="selectDataTipo in selectDatasTipo" :key="selectDataTipo.id" :value="selectDataTipo.id">{{ selectDataTipo.nome }}</option>
                         </select>
                     </div>
                     <div class="mb-1 ml-3 mr-3"> <!--CNPJ do cliente-->
                         <label for="cliente-cnpj-modal-editar" class="label is-small">CNPJ</label>
                         <div class="control">
-                            <input :value="cnpj" @input="AtualizarCnpjVmaska($event.target.value)" v-maska :data-maska="this.vMaskaCnpjString" type="text" class="input is-info is-small" id="cliente-cnpj-modal-editar">
+                            <input :value="cnpj" @input="atualizarCnpjVmaska($event.target.value)" v-maska :data-maska="props.vMaskaCnpjString" type="text" class="input is-info is-small" id="cliente-cnpj-modal-editar">
                         </div>
                     </div>
                     <div class="mb-1 ml-3 mr-3"> <!--Email do cliente-->
@@ -70,7 +70,7 @@
                     </div>
                     <div class="mb-1 mr-3"> <!--UF de cliente-->
                         <label for="cliente-uf-modal-editar" class="label is-small ">UF</label>
-                        <select :value="this.uf" @change="$emit('update:uf', $event.target.value)" class="select is-small" id="cliente-uf-modal-editar">
+                        <select :value="props.uf" @change="$emit('update:uf', $event.target.value)" class="select is-small" id="cliente-uf-modal-editar">
                             <option v-for="selectDataUF in selectDatasUF" :key="selectDataUF.id" :value="selectDataUF.id">{{ selectDataUF.nome }}</option>
                         </select>
                     </div>
@@ -78,9 +78,9 @@
             </div>
             <div class="" id="button-footer"> <!--Botão de adicionar-->
                 <div class="has-text-centered mb-4">
-                    <button @click="AbrirPopupAlterar()" class="button is-small has-background-info-dark has-text-light has-text-weight-semibold">Alterar</button>
-                    <button @click="LimparModalEditar()" class="button is-small has-background-warning-dark has-text-light ml-2 has-text-weight-semibold">Limpar</button>
-                    <button @click="FecharModalEditar()" class="button is-small has-background-danger-dark has-text-light ml-2 has-text-weight-semibold" id="btnVoltarModalEditar">Voltar</button>
+                    <button @click="abrirPopupAlterar()" class="button is-small has-background-info-dark has-text-light has-text-weight-semibold">Alterar</button>
+                    <button @click="limparModalEditar()" class="button is-small has-background-warning-dark has-text-light ml-2 has-text-weight-semibold">Limpar</button>
+                    <button @click="fecharModalEditar()" class="button is-small has-background-danger-dark has-text-light ml-2 has-text-weight-semibold" id="btnVoltarModalEditar">Voltar</button>
                 </div>
             </div>
         </div>
@@ -88,78 +88,67 @@
 
 </template>
 
-<script>
+<script setup>
 
     import { collection, getDocs } from 'firebase/firestore'
     import { db } from '@/firebase'
     import { vMaska } from 'maska'
+    import { onMounted, defineProps, ref, defineEmits } from 'vue';
 
-    const modalEditar = {
-        name: 'ModalEditar',
 
-        data() {
-            return {
-                selectDatasTipo: [],
-                selectDatasUF: []
-            }
-        },
+    const selectDatasTipo = ref([]);
+    const selectDatasUF = ref([]);
 
-        async mounted() {      
-            const selectDatasTipoApi = getDocs(collection(db, 'tipos'));
-                selectDatasTipoApi.then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        this.selectDatasTipo.push(doc.data())
-                    })
+    onMounted(() => {
+        const selectDatasTipoApi = getDocs(collection(db, 'tipos'));
+            selectDatasTipoApi.then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    selectDatasTipo.value.push(doc.data())
                 })
+            });
 
-            const selectDatasUFApi = getDocs(collection(db, 'ufs'));
-                selectDatasUFApi.then((querySnapshot) => {
-                    querySnapshot.forEach((doc) => {
-                        this.selectDatasUF.push(doc.data())
-                    })
+        const selectDatasUFApi = getDocs(collection(db, 'ufs'));
+            selectDatasUFApi.then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    selectDatasUF.value.push(doc.data())
                 })
-        },   
+            });
+    });  
 
-        directives: { Maska: vMaska },
+    const props = defineProps({
+        id: String,
+        nome: String,
+        tipo: String,
+        cnpj: String,
+        email: String,
+        telefone: String,
+        endereco: String,
+        bairro: String,
+        cidade: String,
+        uf: String,
+        mostrarModalAlterar: Boolean,
+        vMaskaCnpjString: String
+    });
 
-        props: {
-            id: String,
-            nome: String,
-            tipo: String,
-            cnpj: String,
-            email: String,
-            telefone: String,
-            endereco: String,
-            bairro: String,
-            cidade: String,
-            uf: String,
-            mostrarModalAlterar: Boolean,
-            vMaskaCnpjString: String
-        },
+    const emit = defineEmits(['abrirPopupAlterar', 'limparModalEditar', 'fecharModalEditar', 'atualizarCnpjVmaska'])
         
-        methods: {
+    const abrirPopupAlterar = () => {
+        emit('abrirPopupAlterar')
+    };
 
-            AbrirPopupAlterar() {
-                this.$emit('AbrirPopupAlterar')
-            },
+    const limparModalEditar = () => {
+        emit('limparModalEditar')
+    };
 
-            LimparModalEditar() {
-                this.$emit('LimparModalEditar')
-            },
+    const fecharModalEditar = () => {
+        emit('fecharModalEditar');
+    };
 
-            FecharModalEditar() {
-                this.$emit('FecharModalEditar');
-            },
-
-            AtualizarCnpjVmaska(novoValor) {
-                this.$emit('update:cnpj', novoValor)
-                this.$emit('AplicarVmaskaCnpj', novoValor)
-            }
-        }
-    }
-
-    export default modalEditar
-
+    const atualizarCnpjVmaska = (novoValor) => {
+        emit('update:cnpj', novoValor)
+        emit('AplicarVmaskaCnpj', novoValor)
+    };
+       
 </script>
 
 <style>

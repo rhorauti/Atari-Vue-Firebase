@@ -61,8 +61,8 @@
     </div>
 
     <ModalTipo 
-            :mostrarModalTipo="dadosClientes.mostrarModalTipo"
-            @fecharModalTipo="fecharModalTipo()"/>
+        :mostrarModalTipo="dadosClientes.mostrarModalTipo"
+        @fecharModalTipo="fecharModalTipo()"/>
 
     <ModalCadastrar 
         v-model:id="dadosClientes.id"
@@ -76,10 +76,10 @@
         v-model:cidade="dadosClientes.cidade"
         v-model:uf="dadosClientes.uf"
         v-model:vMaskaCnpjString="dadosClientes.vMaskaCnpj"
-        @LimparModalCadastrar="limparModal()"
-        @AplicarVmaskaCnpj="aplicarVmaskaCnpj()"
+        @limparModalCadastrar="limparModal()"
+        @aplicarVmaskaCnpj="aplicarVmaskaCnpj()"
         @notificationAdicionar="emitirNotificationAdicionar()"
-        @FecharModalCadastrar="fecharModalCadastrar()"
+        @fecharModalCadastrar="dadosClientes.mostrarModalCadastrar = false"
         :mostrarModalCadastrar="dadosClientes.mostrarModalCadastrar"/>
 
     <ModalEditar 
@@ -93,38 +93,36 @@
         v-model:bairro="dadosClientes.bairro"
         v-model:cidade="dadosClientes.cidade"
         v-model:uf="dadosClientes.uf"
-        @AplicarVmaskaCnpj="aplicarVmaskaCnpj()"
-        @LimparModalEditar="limparModal()"
-        @FecharModalEditar="fecharModalEditar()"
-        @AbrirPopupAlterar="abrirPopupAlterar()"
+        @aplicarVmaskaCnpj="aplicarVmaskaCnpj()"
+        @limparModalEditar="limparModal()"
+        @fecharModalEditar="fecharModalEditar()"
+        @abrirPopupAlterar="abrirPopupAlterar()"
         :mostrarModalAlterar="dadosClientes.mostrarModalAlterar"
         :vMaskaCnpjString="dadosClientes.vMaskaCnpj"
         />
 
-        <PopUpAlterar
-            @FecharPopupAlterar="fecharPopupAlterar()"
-            @EmitirNotificationAlterar="emitirNotificationAlterar()"
-            @FecharModalEditar="fecharModalEditar()"
-            :mostrarPopupAlterar="dadosClientes.mostrarPopupAlterar"
-            :id="dadosClientes.id"
-            :nome="dadosClientes.nome"
-            :tipo="dadosClientes.tipo"
-            :cnpj="dadosClientes.cnpj"
-            :email="dadosClientes.email"
-            :telefone="dadosClientes.telefone"
-            :endereco="dadosClientes.endereco"
-            :bairro="dadosClientes.bairro"
-            :cidade="dadosClientes.cidade"
-            :uf="dadosClientes.uf"/>
+    <PopUpAlterar
+        @FecharPopupAlterar="fecharPopupAlterar()"
+        @EmitirNotificationAlterar="emitirNotificationAlterar()"
+        @FecharModalEditar="fecharModalEditar()"
+        :mostrarPopupAlterar="dadosClientes.mostrarPopupAlterar"
+        :id="dadosClientes.id"
+        :nome="dadosClientes.nome"
+        :tipo="dadosClientes.tipo"
+        :cnpj="dadosClientes.cnpj"
+        :email="dadosClientes.email"
+        :telefone="dadosClientes.telefone"
+        :endereco="dadosClientes.endereco"
+        :bairro="dadosClientes.bairro"
+        :cidade="dadosClientes.cidade"
+        :uf="dadosClientes.uf"/>
 
-        <PopUpExcluir
-            :clienteSelecionadoExcluir="dadosClientes.clienteSelecionadoExcluir"
-            :mostrarPopupExcluir="dadosClientes.mostrarPopupExcluir"
-            :id="dadosClientes.id" 
-            @FecharPopupExcluir="fecharPopupExcluir()"
-            @EmitirNotificationExcluir="emitirNotificationExcluir()"/>
-
-      
+    <PopUpExcluir
+        :clienteSelecionadoExcluir="dadosClientes.clienteSelecionadoExcluir"
+        :mostrarPopupExcluir="dadosClientes.mostrarPopupExcluir"
+        :id="dadosClientes.id" 
+        @FecharPopupExcluir="fecharPopupExcluir()"
+        @EmitirNotificationExcluir="emitirNotificationExcluir()"/>   
 
 </template>
 
@@ -210,10 +208,6 @@ import { ref, onMounted } from 'vue'
     const abrirModalCadastrar = () => {
         limparModal();
         dadosClientes.value.mostrarModalCadastrar = true;
-    }
-
-    const fecharModalCadastrar = () => {
-        dadosClientes.value.mostrarModalCadastrar = false;
     }
 
     const abrirModalEditar = (id, nome, tipo, cnpj, email, telefone, endereco, bairro, cidade, uf) => {
