@@ -1,328 +1,524 @@
-<template>
-
-    <div class="is-flex is-flex-direction-column mx-3">
-        <div class="my-2 p-3 has-background-info-dark" id="div-cabecalho">
-            <div class="is-flex is-justify-content-space-between">
-                <label for="cliente" class="ml-2 has-text-light has-text-weight-semibold">Nome do cliente</label>
-                <input type="text" class="input mx-3" id="input-pesquisar" v-model="dadosClientes.inputPesquisar">
-                <button class="button has-text-light has-background-success-dark has-text-weight-semibold mr-3" id="btn-pesquisar">Pesquisar</button>
-                <button @click="abrirModalCadastrar(); " class="button has-text-light has-background-success-dark has-text-weight-semibold" id="btn-cadastrar">Cadastrar</button>
-            </div>
-        </div>
-
-        <NotificationMessage
-            @FecharNotificationAdicionar="fecharNotificationAdicionar()"
-            @FecharNotificationAlterar="fecharNotificationAlterar()"
-            @FecharNotificationExcluir="fecharNotificationExcluir()"
-            :notificationAdicionar="dadosClientes.notificationAdicionar"
-            :notificationAlterar="dadosClientes.notificationAlterar"
-            :notificationExcluir="dadosClientes.notificationExcluir"/>
-
-        <table class="table is-bordered is-hoverable" id="table-data">
-            <thead>
-                <tr class="">
-                    <th class="has-background-info-dark has-text-light has-text-centered" hidden>Id</th>
-                    <th class="has-background-info-dark has-text-light has-text-centered">Nome</th>
-                    <th class="has-background-info-dark has-text-light has-text-centered">Tipo
-                        <font-awesome-icon @click="abrirModalTipo()" :icon="['fas', 'plus']" class="has-background-warning-dark is-clickable"/>                    
-                    </th>
-                    <th class="has-background-info-dark has-text-light has-text-centered">CNPJ</th>
-                    <th class="has-background-info-dark has-text-light has-text-centered">Email</th>
-                    <th class="has-background-info-dark has-text-light has-text-centered">Telefone</th>
-                    <th class="has-background-info-dark has-text-light has-text-centered">Endereço</th>
-                    <th class="has-background-info-dark has-text-light has-text-centered">Bairro</th>
-                    <th class="has-background-info-dark has-text-light has-text-centered">Cidade</th>
-                    <th class="has-background-info-dark has-text-light has-text-centered">UF
-                        <font-awesome-icon :icon="['fas', 'plus']" class="has-background-warning-dark is-clickable"/> 
-                    </th>
-                        
-                    <th class="has-background-info-dark has-text-light has-text-centered">Ação</th>
-                </tr>
-            </thead>
-            <tbody class="">
-                <tr v-for="cliente in dadosClientes.clientes" :key="cliente.id">
-                    <td class="has-text-centered" hidden>{{ cliente.id }}</td>
-                    <td class="has-text-centered">{{ cliente.nome }}</td>
-                    <td class="has-text-centered">{{ cliente.tipo }}</td>
-                    <td class="has-text-centered">{{ cliente.cnpj }}</td>
-                    <td class="has-text-centered">{{ cliente.email }}</td>
-                    <td class="has-text-centered">{{ cliente.telefone }}</td>
-                    <td class="has-text-centered">{{ cliente.endereco }}</td>
-                    <td class="has-text-centered">{{ cliente.bairro }}</td>
-                    <td class="has-text-centered">{{ cliente.cidade }}</td>
-                    <td class="has-text-centered">{{ cliente.uf }}</td>
-                    <td class="" style="width: 7.1rem; height: 1.0rem;">
-                        <button @click="abrirModalEditar(cliente.id, cliente.nome, cliente.tipo, cliente.cnpj, cliente.email, cliente.telefone,  cliente.endereco, cliente.bairro,cliente.cidade, cliente.uf )" class="button is-warning btnEditar">Editar</button>                                                                                 
-                        <button @click="abrirPopupExcluir(cliente.id, cliente.nome)" class="button is-danger btnExcluir ml-2">Excluir</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table> 
-    </div>
-
-    <ModalTipo 
-        :mostrarModalTipo="dadosClientes.mostrarModalTipo"
-        @fecharModalTipo="fecharModalTipo()"/>
-
-    <ModalCadastrar 
-        v-model:id="dadosClientes.id"
-        v-model:nome="dadosClientes.nome"
-        v-model:tipo="dadosClientes.tipo"
-        v-model:cnpj="dadosClientes.cnpj"
-        v-model:email="dadosClientes.email"
-        v-model:telefone="dadosClientes.telefone"
-        v-model:endereco="dadosClientes.endereco"
-        v-model:bairro="dadosClientes.bairro"
-        v-model:cidade="dadosClientes.cidade"
-        v-model:uf="dadosClientes.uf"
-        v-model:vMaskaCnpjString="dadosClientes.vMaskaCnpj"
-        @limparModalCadastrar="limparModal()"
-        @aplicarVmaskaCnpj="aplicarVmaskaCnpj()"
-        @notificationAdicionar="emitirNotificationAdicionar()"
-        @fecharModalCadastrar="dadosClientes.mostrarModalCadastrar = false"
-        :mostrarModalCadastrar="dadosClientes.mostrarModalCadastrar"/>
-
-    <ModalEditar 
-        v-model:id="dadosClientes.id"
-        v-model:nome="dadosClientes.nome"
-        v-model:tipo="dadosClientes.tipo"
-        v-model:cnpj="dadosClientes.cnpj"
-        v-model:email="dadosClientes.email"
-        v-model:telefone="dadosClientes.telefone"
-        v-model:endereco="dadosClientes.endereco"
-        v-model:bairro="dadosClientes.bairro"
-        v-model:cidade="dadosClientes.cidade"
-        v-model:uf="dadosClientes.uf"
-        @aplicarVmaskaCnpj="aplicarVmaskaCnpj()"
-        @limparModalEditar="limparModal()"
-        @fecharModalEditar="fecharModalEditar()"
-        @abrirPopupAlterar="abrirPopupAlterar()"
-        :mostrarModalAlterar="dadosClientes.mostrarModalAlterar"
-        :vMaskaCnpjString="dadosClientes.vMaskaCnpj"
-        />
-
-    <PopUpAlterar
-        @FecharPopupAlterar="fecharPopupAlterar()"
-        @EmitirNotificationAlterar="emitirNotificationAlterar()"
-        @FecharModalEditar="fecharModalEditar()"
-        :mostrarPopupAlterar="dadosClientes.mostrarPopupAlterar"
-        :id="dadosClientes.id"
-        :nome="dadosClientes.nome"
-        :tipo="dadosClientes.tipo"
-        :cnpj="dadosClientes.cnpj"
-        :email="dadosClientes.email"
-        :telefone="dadosClientes.telefone"
-        :endereco="dadosClientes.endereco"
-        :bairro="dadosClientes.bairro"
-        :cidade="dadosClientes.cidade"
-        :uf="dadosClientes.uf"/>
-
-    <PopUpExcluir
-        :clienteSelecionadoExcluir="dadosClientes.clienteSelecionadoExcluir"
-        :mostrarPopupExcluir="dadosClientes.mostrarPopupExcluir"
-        :id="dadosClientes.id" 
-        @FecharPopupExcluir="fecharPopupExcluir()"
-        @EmitirNotificationExcluir="emitirNotificationExcluir()"/>   
-
-</template>
-
 <script setup>
 
-import ModalCadastrar from '@/components/clientes/ModalCadastrar.vue'
-import ModalEditar from '@/components/clientes/ModalEditar.vue'
-import ModalTipo from '@/components/clientes/ModalTipo.vue'
-import PopUpExcluir from '@/components/clientes/PopUpExcluir.vue'
-import PopUpAlterar from '@/components/clientes/PopUpAlterar.vue'
-import NotificationMessage from '@/components/clientes/NotificationMessage.vue'
-import { collection, onSnapshot } from 'firebase/firestore'
+import ModalCard from '@/components/ModalCard.vue'
+import PopUpConfirmation from '@/components/PopUpConfirmation.vue'
+import { collection, getDocs, setDoc, deleteDoc, doc, updateDoc, getDoc } from 'firebase/firestore'
 import { db } from '@/firebase'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { vMaska } from 'maska'
+import { Block, Notify, Confirm } from 'notiflix';
 
-    const dadosClientes = ref({
-        clientes: [],
-        id: '',
-        nome: '',
-        tipo: '',
-        cnpj: '',
-        email: '',
-        telefone: '',
-        endereco: '',
-        bairro: '',
-        cidade: '',
-        uf: '',
-        vMaskaCnpj: '',
-        clienteSelecionadoExcluir: '',
-        notificationExcluir: false,
-        notificationAlterar: false,
-        notificationAdicionar: false,
-        mostrarModalCadastrar: false,
-        mostrarPopupExcluir: false,
-        mostrarModalAlterar: false,
-        mostrarPopupAlterar: false,
-        mostrarModalTipo: false,
-        inputPesquisar: ''
-    })   
+const dadosClientes = ref({
+    id: null,
+    nome: null,
+    tipo: null,
+    cnpj: null,
+    email: null,
+    telefone: null,
+    endereco: null,
+    bairro: null,
+    cidade: null,
+    uf: null,
+});
 
-    onMounted(() => {
-        const query = collection(db, 'clientes');
-        onSnapshot(query, (querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                const dataResult = doc.data()
-                dataResult.id = doc.id
-                dadosClientes.value.clientes.push(dataResult)
-            }) 
+const arrayHome = ref([]);
+const inputPesquisar = ref("");
+const selectDatasTipo = ref([]);
+const selectDatasUF = ref([]);
+
+function atualizarDadosHome() {
+    arrayHome.value = [];
+    const query = getDocs(collection(db, 'clientes'));
+    query.then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            const dataResult = doc.data();
+            dataResult.id = doc.id;
+            arrayHome.value.push(dataResult);
         })
     })
+}
 
+onMounted(() => {
+    // Carrega os dados dos clientes na tabela Home
+    atualizarDadosHome()
+    // Carrega os select Tipo.
+    const selectDatasTipoApi = getDocs(collection(db, 'tipos'));
+        selectDatasTipoApi.then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                selectDatasTipo.value.push(doc.data());
+            })
+        });
+    // Carrega os select UF.
+    const selectDatasUFApi = getDocs(collection(db, 'ufs'));
+    selectDatasUFApi.then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            selectDatasUF.value.push(doc.data());
+        })
+    })  
+});
 
-    const fecharModalTipo = () => {
-        dadosClientes.value.mostrarModalTipo = false;
-    }
+const filtroPesquisaNomeHome = computed(() => {
+    if (inputPesquisar.value == "") return arrayHome.value;
+    return arrayHome.value.filter(dado => dado.nome.toLowerCase().includes(inputPesquisar.value.toLowerCase()));
+})
 
-    const abrirModalTipo = () => {
-        dadosClientes.value.mostrarModalTipo = true
-    }
-
-    const aplicarVmaskaCnpj = () => {
-        if (dadosClientes.value.cnpj.length <= 14) {
-            dadosClientes.value.vMaskaCnpj = "###.###.###-##"
-        } else {
-            dadosClientes.value.vMaskaCnpj = "##.###.###/####-##"
+// Excluir um registro do banco de dados.
+// Confirm.merge({plainText: false})
+function excluirRegistro(cliente) {
+    Confirm.show(
+        "Confirmação de exclusão",
+        `Deseja excluir o cliente <b>${cliente.nome}</b>?`,
+        "Sim",
+        "Cancelar",
+        () => {
+            const docRef = doc(db, 'clientes', cliente.id);
+            deleteDoc(docRef);
+            atualizarDadosHome();
+            Notify.success("Registro excluido com sucesso!");
         }
-    }
+    )
+}
 
-    const limparModal = () => {
-        dadosClientes.value.id = '',
-        dadosClientes.value.nome = '',
-        dadosClientes.value.tipo = '',
-        dadosClientes.value.cnpj = '',
-        dadosClientes.value.email = '',
-        dadosClientes.value.telefone = '',
-        dadosClientes.value.endereco = '',
-        dadosClientes.value.bairro = '',
-        dadosClientes.value.cidade = '',
-        dadosClientes.value.uf = '',
-        dadosClientes.value.inputPesquisar = ''
-    }
+const isModalCadastrarEditarAtivo = ref(false);
+const tituloFormulario = ref("");
+const mostrarBtnFormulario = ref(false)
 
-    const abrirModalCadastrar = () => {
-        limparModal();
-        dadosClientes.value.mostrarModalCadastrar = true;
-    }
+// Abre o modal aterar ao clicar no botão editar do Home
+function abrirModalAlterar(cliente) {
+    isModalCadastrarEditarAtivo.value = true
+    tituloFormulario.value = "Alteração dos dados do cliente"
+    mostrarBtnFormulario.value = false
+    dadosClientes.value.id = cliente.id,
+    dadosClientes.value.nome = cliente.nome,
+    dadosClientes.value.tipo = cliente.tipo,
+    dadosClientes.value.cnpj = cliente.cnpj,
+    dadosClientes.value.email = cliente.email,
+    dadosClientes.value.telefone = cliente.telefone,
+    dadosClientes.value.endereco = cliente.endereco,
+    dadosClientes.value.bairro = cliente.bairro,
+    dadosClientes.value.cidade = cliente.cidade,
+    dadosClientes.value.uf = cliente.uf
+}
 
-    const abrirModalEditar = (id, nome, tipo, cnpj, email, telefone, endereco, bairro, cidade, uf) => {
-        dadosClientes.value.mostrarModalAlterar = true
-        dadosClientes.value.id = id,
-        dadosClientes.value.nome = nome,
-        dadosClientes.value.tipo = tipo,
-        dadosClientes.value.cnpj = cnpj,
-        dadosClientes.value.email = email,
-        dadosClientes.value.telefone = telefone,
-        dadosClientes.value.endereco = endereco,
-        dadosClientes.value.bairro = bairro,
-        dadosClientes.value.cidade = cidade,
-        dadosClientes.value.uf = uf
-    }
+const ispopUpConfirmationAtivo = ref(false)
 
-    const fecharModalEditar = () => {
-        dadosClientes.value.mostrarModalAlterar = false;
-    }
+// Envia os dados de alteração para o firebase
+function alterarRegistro() {
+    Block.pulse(".tabelaHome");
+    const docRef = doc(db, 'clientes', dadosClientes.value.id)
+    updateDoc(docRef, {
+        nome: dadosClientes.value.nome?? null,
+        tipo: dadosClientes.value.tipo?? null,
+        cnpj: dadosClientes.value.cnpj?? null,
+        email: dadosClientes.value.email?? null,
+        telefone: dadosClientes.value.telefone?? null,
+        endereco: dadosClientes.value.endereco?? null,
+        bairro: dadosClientes.value.bairro?? null, 
+        cidade: dadosClientes.value.cidade?? null,
+        uf: dadosClientes.value.uf?? null
+    })
+    .then(() => {
+        dadosClientes.value = {};
+        atualizarDadosHome();
+        Block.remove(".tabelaHome");
+        ispopUpConfirmationAtivo.value = false;
+        isModalCadastrarEditarAtivo.value = false;
+        Notify.success("Registro alterado com sucesso!")
+    })
+}
 
-    const abrirPopupAlterar = () => {
-        dadosClientes.value.mostrarPopupAlterar = true
-    }
+// Abre o formulário Cadastrar ao clicar no botão Cadastrar do Home
+function abrirModalCadastrar() {
+    dadosClientes.value = {};
+    tituloFormulario.value = "Cadastro de novo cliente"
+    mostrarBtnFormulario.value = true
+    isModalCadastrarEditarAtivo.value = true;
+}
 
-    const fecharPopupAlterar = () => {
-        dadosClientes.value.mostrarPopupAlterar = false;
-    }
+// Faz a validação do campo nome do formulário
+const isNomeValido = computed(() => {
+    if (dadosClientes.value.nome == null || dadosClientes.value.nome == 0) return false
+    return true 
+}) 
 
-    const abrirPopupExcluir = (id, nome) => {
-        dadosClientes.value.mostrarPopupExcluir = true
-        dadosClientes.value.clienteSelecionadoExcluir = nome
-        dadosClientes.value.id = id
-    }   
+const vMaskaCnpj = ref('');
 
-    const fecharPopupExcluir = () => {
-        dadosClientes.value.mostrarPopupExcluir = false
+// Altera o formato do CPF / CNPJ dependendo do número de caracteres. 
+function atualizarCnpjVmaska(novoValor) {
+    if (novoValor.length <= 14) {
+        vMaskaCnpj.value = "###.###.###-##";
+    } else {
+        vMaskaCnpj.value = "##.###.###/####-##";
     }
+}
 
-    const emitirNotificationAdicionar = () => {
-        dadosClientes.value.clientes = [];
-        dadosClientes.value.notificationAdicionar = true
-        let setTime = setTimeout(() => {
-            dadosClientes.value.notificationAdicionar = false;
-            clearTimeout(setTime)
-        }, 4000); 
-    }
+// Adiciona um novo registro no firebase.
+function adicionarRegistro() {
+    Block.pulse(".tabelaHome");
+    const docIndice = doc(db, 'indices', 'cliente');
+    getDoc(docIndice).then((d) => {
+        let idCliente = d.data().ultimo;
+        idCliente++;
+        setDoc(docIndice, {ultimo: idCliente});
+        setDoc(doc(db, 'clientes', idCliente.toString()), {
+            nome: dadosClientes.value.nome ?? "",
+            tipo: dadosClientes.value.tipo ?? "",
+            cnpj: dadosClientes.value.cnpj ?? "",
+            email: dadosClientes.value.email ?? "",
+            telefone: dadosClientes.value.telefone ?? "",
+            endereco: dadosClientes.value.endereco ?? "",
+            bairro: dadosClientes.value.bairro ?? "", 
+            cidade: dadosClientes.value.cidade ?? "",
+            uf: dadosClientes.value.uf ?? ""
+        }).then(() => {
+            dadosClientes.value = {};
+            inputPesquisar.value = "";
+            atualizarDadosHome();
+            isModalCadastrarEditarAtivo.value = false;
+            Notify.success("Registro inserido com sucesso!");
+        }).catch(() => {
+            Notify.danger("Falha ao registrar o cliente")
+        }).finally(() => {
+            Block.remove(".tabelaHome");
+        })
+    })
+}
 
-    const emitirNotificationAlterar = () => {
-        dadosClientes.value.clientes = [];
-        dadosClientes.value.notificationAlterar = true
-        let setTime = setTimeout(() => {
-            dadosClientes.value.notificationAlterar = false;
-            clearTimeout(setTime)
-        }, 4000);
-    }
+// Fecha o formulário ao clicar no botão cancelar.
+function cancelarRegistro() {
+    Confirm.show(
+        "Cancelar formulário?",
+        "Deseja sair do formulário? Os dados serão perdidos!",
+        "Sim",
+        "Cancelar",
+        () => {
+            inputPesquisar.value = "";
+            isModalCadastrarEditarAtivo.value = false;
+        }
+    )
+}
 
-    const emitirNotificationExcluir = () => {
-        dadosClientes.value.clientes = [];
-        dadosClientes.value.notificationExcluir = true;
-        let setTime = setTimeout(() => {
-            dadosClientes.value.notificationExcluir = false;
-            clearTimeout(setTime)
-        }, 4000);
-    }
+// Limpar os campos do formulário ao clicar no botão limpar
+function limparRegistro() {
+    Confirm.show(
+        "Limpar os dados?",
+        "Deseja limpar os campos?",
+        "Sim",
+        "Cancelar",
+        () => {
+            dadosClientes.value = {};
+        }
+    )
+}
 
-    const fecharNotificationAdicionar = () => {
-        dadosClientes.value.notificationAdicionar = false
-    }
+const isModalTipoAtivo = ref(false);
 
-    const fecharNotificationAlterar = () => {
-        dadosClientes.value.notificationAlterar = false
-    }
+function abrirModalTipo() {
+    isModalTipoAtivo.value = true;
+}
 
-    const fecharNotificationExcluir = () => {
-        dadosClientes.value.notificationExcluir = false
-    }
+function cancelarRegistroTipo() {
+    isModalTipoAtivo.value = false;
+}
 
 </script>
 
 
 <style>
 
-    :root {
-        --font-size-cabecalho: 0.60rem;
-        --font-size-table: 0.56rem;
-    }
+@import 'bulma/css/bulma.min.css';
+@import 'bulma-extensions/dist/css/bulma-extensions.min.css';
 
-    div label {
-        width: 6.8rem;
-        align-self: center;
-        font-size: var(--font-size-cabecalho);
-    }
+body {
+    font-size: 0.7rem;
+}
 
-    #btn-cadastrar, #btn-pesquisar, #input-pesquisar {
-        font-size: var(--font-size-cabecalho);
-    }
-
-    #div-cabecalho {
-        border-radius: 0.5rem;
-    }
-
-    td, th {
-        text-align: center;
-        font-size: var(--font-size-table);
-    }
-
-    select {
-        font-size: var(--font-size-table);
-        text-align: left;
-        vertical-align: -webkit-baseline-middle;
-    }
-
-    .btnEditar, .btnExcluir {
-        font-size: var(--font-size-table);
-        font-weight: 600;
-    }
+td, th {
+    text-align: center;
+}   
 
 </style>
+
+<template>
+<!--Home área de filtro + tabela-->
+<div class="mx-4 my-2 is-flex-grow-1">
+    <!--Campo de filtro da tabela + botão cadastrar-->
+    <div class="field is-grouped box p-2">
+        <label class="label is-small mx-3 is-align-self-center">Nome do cliente</label>
+        <div class="control mr-3 is-expanded">
+            <input type="text" class="input is-small" v-model="inputPesquisar">
+        </div>
+        <div class="control">
+            <button @click="abrirModalCadastrar" class="button is-small is-info has-text-weight-bold is-fullwidth">
+                <font-awesome-icon :icon="['fas', 'plus']" class="mr-1"/>
+                <span>Cadastrar</span> 
+            </button>
+        </div>
+    </div>
+    <!--Tabela home de clientes-->
+    <div class="table-container box p-0 tabelaHome">
+        <table class="table is-narrow is-bordered is-hoverable is-fullwidth">
+            <thead>
+                <tr class="has-background-dark has-text-light">
+                    <th class="has-text-centered has-text-light">Id</th>
+                    <th class="has-text-centered has-text-light">Nome</th>
+                    <th class="has-text-centered has-text-light">Tipo
+                        <font-awesome-icon @click="abrirModalTipo()" :icon="['fas', 'plus']" class="has-background-warning-dark is-clickable"/>                    
+                    </th>
+                    <th class="has-text-centered has-text-light">CNPJ</th>
+                    <th class="has-text-centered has-text-light">Email</th>
+                    <th class="has-text-centered has-text-light">Telefone</th>
+                    <th class="has-text-centered has-text-light" hidden>Endereço</th>
+                    <th class="has-text-centered has-text-light" hidden>Bairro</th>
+                    <th class="has-text-centered has-text-light">Cidade</th>
+                    <th class="has-text-centered has-text-light">UF
+                        <font-awesome-icon :icon="['fas', 'plus']" class="has-background-warning-dark is-clickable"/> 
+                    </th>
+                    <th class="has-text-centered has-text-light">Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="cliente in filtroPesquisaNomeHome" :key="cliente.id"
+                    class="has-text-centered is-vcentered">
+                    <td class="is-vcentered">{{ cliente.id }}</td>
+                    <td class="is-vcentered">{{ cliente.nome }}</td>
+                    <td class="is-vcentered">{{ cliente.tipo }}</td>
+                    <td class="is-vcentered">{{ cliente.cnpj }}</td>
+                    <td class="is-vcentered">{{ cliente.email }}</td>
+                    <td class="is-vcentered">{{ cliente.telefone }}</td>
+                    <td class="is-vcentered" hidden>{{ cliente.endereco }}</td>
+                    <td class="is-vcentered" hidden>{{ cliente.bairro }}</td>
+                    <td class="is-vcentered">{{ cliente.cidade }}</td>
+                    <td class="is-vcentered">{{ cliente.uf }}</td>
+                    <td class="is-vcentered">
+                        <div class="flex">
+                            <button @click="abrirModalAlterar(cliente)" class="button is-small is-warning">
+                                <font-awesome-icon :icon="['fas', 'pen']"/>
+                            </button>                                                                                 
+                            <button @click="excluirRegistro(cliente)" class="button is-small is-danger ml-2">
+                                <font-awesome-icon :icon="['fas', 'trash']"/>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table> 
+    </div>
+</div>
+
+<!--Modal Cadastrar e Editar-->
+<ModalCard @closeModalCard="cancelarRegistro" :isAtivo="isModalCadastrarEditarAtivo" :titulo="tituloFormulario">
+    <template #body>
+        <div class="columns">
+            <!--1a coluna do formulário-->
+            <div class="column">
+                    <!--Id do cliente-->
+                <div class="field">
+                    <label class="label is-small">Id</label>
+                    <div class="control">
+                        <input v-model="dadosClientes.id" type="text" class="input is-small is-info has-background-white" disabled>
+                    </div>
+                </div>
+                    <!--Nome do cliente-->
+                <div class="field">
+                    <label class="label is-small">Nome</label>
+                    <div class="control">
+                        <input v-model="dadosClientes.nome" type="text" :class="{'is-danger': !isNomeValido}" class="input is-info is-small">
+                    </div>
+                    <p v-show="!isNomeValido" class="help is-danger">Campo obrigatório : Insira um nome</p>
+                </div>
+                <!--Tipo de cliente-->
+                <div class="field">
+                    <label class="label is-small">Tipo</label>
+                    <div class="control select is-small select is-info is-small is-hovered is-fullwidth"> 
+                        <select v-model="dadosClientes.tipo">
+                            <option disabled>Selecione um tipo</option>
+                            <option v-for="selectDataTipo in selectDatasTipo" :key="selectDataTipo.id">{{ selectDataTipo.nome }}</option>
+                        </select>
+                    </div>
+                </div>
+                <!--CNPJ do cliente-->
+                <div class="field">
+                    <label class="label is-small">CPF / CNPJ</label>
+                    <div class="control">
+                        <input v-model="dadosClientes.cnpj" @input="atualizarCnpjVmaska($event.target.value)" type="text" class="input is-info is-small" v-maska :data-maska="vMaskaCnpj">
+                    </div>
+                </div>
+                <!--Email do cliente-->
+                <div class="field">
+                    <label class="label is-small">E-mail</label>
+                    <div class="control">
+                        <input v-model="dadosClientes.email" type="email" class="input is-info is-small" placeholder="exemple@gmail.com" >
+                    </div>
+                </div>
+            </div>
+            <!--2a coluna do formulário-->
+            <div class="column">
+                <!--Telefone do cliente-->
+                <div class="field"> 
+                    <label class="label is-small">Telefone</label>
+                    <div class="control">
+                        <input v-model="dadosClientes.telefone" type="tel" class="input is-info is-small" placeholder="(xx) xxxxx-xxxx" v-maska data-maska="(##) #####-####">
+                    </div>
+                </div>
+                <!--Endereço do cliente-->
+                <div class="field"> 
+                    <label class="label is-small">Endereço</label>
+                    <div class="control">
+                        <input v-model="dadosClientes.endereco" type="text" class="input is-info is-small">
+                    </div>
+                </div>
+                <!--Bairro do cliente-->
+                <div class="field"> 
+                    <label class="label is-small">Bairro</label>
+                    <div class="control">
+                        <input v-model="dadosClientes.bairro" type="text" class="input is-info is-small">
+                    </div>
+                </div>
+                <!--Cidade do cliente-->
+                <div class="field"> 
+                    <label class="label is-small">Cidade</label>
+                    <div class="control">
+                        <input v-model="dadosClientes.cidade" type="text" class="input is-info is-small">
+                    </div>
+                </div>
+                <!--UF de cliente-->
+                <div class="field"> 
+                    <label class="label is-small ">UF</label>
+                    <div class="select is-info is-small is-fullwidth">
+                        <select v-model="dadosClientes.uf">
+                            <option disabled value="">Selecione uma UF</option>
+                            <option v-for="selectDataUF in selectDatasUF" :key="selectDataUF.id">{{ selectDataUF.nome }}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    <template #footer>
+        <button v-if="mostrarBtnFormulario" @click="adicionarRegistro" :disabled="!isNomeValido" class="button is-success">Adicionar</button>
+        <button v-else @click="ispopUpConfirmationAtivo = true" :disabled="!isNomeValido" class="button is-success">Alterar</button>
+        <button @click="limparRegistro" class="button is-warning ml-2">Limpar</button>
+        <button @click="cancelarRegistro" class="button is-danger">Cancelar</button>
+    </template>
+</ModalCard>
+
+<ModalCard :is-ativo="isModalTipoAtivo" titulo="Tipo de Cliente" @closeModalCard = "cancelarRegistroTipo()">
+    <template #body>
+        <div class="field">
+            <label for="" class="label is-small">Id</label>
+            <div class="control">
+                <input type="text" class="input is-small is-info has-background-white" disabled>
+            </div>
+        </div>
+        <div class="field">
+            <label for="" class="label is-small">Tipo</label>
+            <div class="control">
+                <input type="text" class="input is-small is-info">
+            </div>
+        </div>
+        <table class="table is-bordered is-fullwidth">
+            <thead>
+                <tr>
+                    <th class="has-text-centered">Id</th>
+                    <th class="has-text-centered">Tipo</th>
+                    <th class="has-text-centered">Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="has-text-centered">
+                    <td class="is-vcentered">1</td>
+                    <td class="is-vcentered">Pessoa Física</td>
+                    <td class="is-vcentered">
+                        <button class="button is-small is-warning">
+                            <font-awesome-icon :icon="['fas', 'pen']"/>
+                        </button>                                                                                 
+                        <button class="button is-small is-danger ml-2">
+                            <font-awesome-icon :icon="['fas', 'trash']"/>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </template>
+    <template #footer>
+        <button class="button is-success">Adicionar</button>
+        <button class="button is-warning ml-2">Limpar</button>
+        <button @click="cancelarRegistroTipo()" class="button is-danger">Cancelar</button>
+    </template>
+</ModalCard>
+
+<!--Pop up confirmação de alteração de dados-->
+<PopUpConfirmation :ispopUpConfirmationAtivo="ispopUpConfirmationAtivo" :titlePopUpConfirmation="'Deseja alterar os dados conforme abaixo?'">
+    <template #body>
+        <div class="columns is-vcentered is-gapless">
+            <!--1a coluna da tabela-->
+            <div class="column">
+                <table class="table is-bordered mt-3">
+                    <tbody>
+                        <tr>
+                            <td class="td-title">Id</td>
+                            <td class="td-data">{{ dadosClientes.id }}</td>
+                        </tr>
+                        <tr>
+                            <td class="td-title">Nome</td>
+                            <td class="td-data">{{ dadosClientes.nome }}</td>
+                        </tr>
+                        <tr>
+                            <td class="td-title">Tipo</td>
+                            <td class="td-data">{{ dadosClientes.tipo }}</td>
+                        </tr>
+                        <tr>
+                            <td class="td-title">CNPJ</td>
+                            <td class="td-data">{{ dadosClientes.cnpj }}</td>
+                        </tr>
+                        <tr>
+                            <td class="td-title">E-mail</td>
+                            <td class="td-data">{{ dadosClientes.email }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div> 
+            <!--2a coluna da tabela-->
+            <div class="column">
+                <table class="table is-bordered mt-3">
+                    <tbody>
+                        <tr>
+                            <td class="td-title">Telefone</td>
+                            <td class="td-data">{{ dadosClientes.telefone }}</td>
+                        </tr>
+                        <tr>
+                            <td class="td-title">Endereço</td>
+                            <td class="td-data">{{ dadosClientes.endereco }}</td>
+                        </tr>
+                        <tr>
+                            <td class="td-title">Bairro</td>
+                            <td class="td-data">{{ dadosClientes.bairro }}</td>
+                        </tr>
+                        <tr>
+                            <td class="td-title">Cidade</td>
+                            <td class="td-data">{{ dadosClientes.cidade }}</td>
+                        </tr>
+                        <tr>
+                            <td class="td-title">UF</td>
+                            <td class="td-data">{{ dadosClientes.uf }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+    <template #footer>
+        <div class="is-flex is-justify-content-center">
+            <div class="control">
+                <button @click="alterarRegistro" class="button has-background-success-dark has-text-light mr-3">Alterar</button>
+            </div>
+            <div class="control">
+                <button @click="ispopUpConfirmationAtivo = false" class="button is-warning">Cancelar</button>
+            </div>
+        </div>
+    </template>
+</PopUpConfirmation>
+
+</template>
+
