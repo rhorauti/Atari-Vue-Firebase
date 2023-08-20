@@ -1,10 +1,13 @@
-  <script setup>
+<script setup>
 
-  import { defineAsyncComponent } from 'vue'
-  
-  const MenuInicial = defineAsyncComponent(() => import('@/components/MenuInicial.vue')) 
+import { defineAsyncComponent } from 'vue'
+import { useStoreUsers } from '@/stores/UserStore'
 
-  </script>
+const MenuInicial = defineAsyncComponent(() => import('@/components/MenuInicial.vue')) 
+
+const userStore = useStoreUsers();
+
+</script>
 
   <style>
   
@@ -16,7 +19,9 @@
 
 <template>
 
-<MenuInicial></MenuInicial>
+<MenuInicial v-show="userStore.userState.isLogado"></MenuInicial>
+
+<router-view/>
 
 </template>
 

@@ -1,15 +1,16 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+// import { useStoreUsers } from '@/stores/UserStore'
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import(/* webpackChunkName: "ClientesView" */ '../views/BemVindo.vue')
+    component: () => import(/* webpackChunkName: "BemVindo" */ '../views/BemVindo.vue')
   },
   {
     path: '/login',
     name: 'Login',
-    component: () => import(/* webpackChunkName: "ClientesView" */ '../views/LoginView.vue')
+    component: () => import(/* webpackChunkName: "LoginView" */ '../views/LoginView.vue')
   },
   {
     path: '/clientes',
@@ -28,15 +29,13 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  // const store = useStore();
-  const usuarioLogado = true;
-  if (!usuarioLogado && to.name != 'Login') {
-    next({name: 'Login'});
-  } else {
-    
-    next();
-  }
-});
+// router.beforeEach((to, from, next) => {
+//   const userStore = useStoreUsers();
+//   if (!userStore.userState.isLogado && to.name != 'Login') {
+//     next({name: 'Login'});
+//   } else {
+//     next();
+//   }
+// });
 
 export default router
