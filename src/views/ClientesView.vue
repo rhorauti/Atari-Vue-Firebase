@@ -21,6 +21,7 @@ const dadosClientes = ref({
     uf: null,
 });
 
+const tableHomeHeaders = ['Id', 'Cadastro', 'Nome', 'Tipo', 'CNPJ', 'Email', 'Telefone', 'Endereço', 'Bairro', 'Cidade', 'UF', 'Ação'];
 const tableHeadersTipo = ['Id', 'Tipo', 'Ação']
 const tableHeadersUF = ['Id', 'UF', 'Ação']
 
@@ -39,7 +40,6 @@ function atualizarDadosHome() {
             arrayHome.value.push(dataResult);
         })
     })
-    arrayHome.value.sort((a, b) => (a.id > b.id) ? 1 : -1)
 }
 
 function atualizarDadosTipo() {
@@ -90,10 +90,17 @@ function excluirRegistro(cliente) {
         "Sim",
         "Cancelar",
         () => {
+            Loading.pulse();
             const docRef = doc(db, 'clientes', cliente.id);
-            deleteDoc(docRef);
-            atualizarDadosHome();
-            Notify.success("Registro excluido com sucesso!");
+            deleteDoc(docRef).then(() => {
+                atualizarDadosHome();
+                Loading.remove();
+                Notify.success("Registro excluido com sucesso!");
+            }).catch(() => {
+                Notify.failure('Erro ao excluir o registro!')
+            }).finally(() => {
+                Loading.remove();
+            });
         }
     )
 }
@@ -373,10 +380,16 @@ function excluirTipo(tipo) {
         "Sim",
         "Cancelar",
         () => {
+            Loading.pulse();
             const docRef = doc(db, 'tipos', tipo.id);
-            deleteDoc(docRef);
-            atualizarDadosTipo();
-            Notify.success("Registro excluido com sucesso!");
+            deleteDoc(docRef).then(() => {
+                atualizarDadosTipo();
+                Notify.success("Registro excluido com sucesso!");
+            }).catch(() => {
+                Notify.failure('Erro ao excluir o tipo!');
+            }).finally(() => {
+                Loading.remove();
+            });
         }
     )
 }
@@ -503,10 +516,16 @@ function excluirUF(uf) {
         "Sim",
         "Cancelar",
         () => {
+            Loading.pulse();
             const docRef = doc(db, 'ufs', uf.id);
-            deleteDoc(docRef);
-            atualizarDadosUF();
-            Notify.success("Registro excluido com sucesso!");
+            deleteDoc(docRef).then(() => {
+                atualizarDadosUF();
+                Notify.success("Registro excluido com sucesso!");
+            }).catch(() => {
+                Notify.failure('Erro ao excluir a uf!')
+            }).finally(() => {
+                Loading.remove();
+            });
         }
     )
 }
@@ -550,49 +569,61 @@ td, th {
     justify-content: center;
 }
 
+.filtro-input {
+    margin-bottom: 0;
+}
+
 </style>
 
 <template>
 <!--Home área de filtro + tabela clientes-->
-<div class="mx-4 my-2 is-flex-grow-1">
+<div class="mx-4 my-4">
     <!--Campo de filtro da tabela + botão cadastrar-->
-    <div class="field is-grouped">
+    <div class="field is-grouped is-justify-content-space-between mb-3">
         <label class="label is-small mx-3 is-align-self-center">Nome do cliente</label>
         <p class="control is-expanded">
             <input type="text" class="input is-small" v-model="inputPesquisar">
         </p>
-        <p class="control">
-            <button @click="abrirModalCadastrar" class="button is-small is-info has-text-weight-bold is-fullwidth">
-                <font-awesome-icon :icon="['fas', 'plus']" class="mr-1"/>
-                <span>Cadastrar</span> 
-            </button>
-        </p>
+        <div class="field is-grouped">
+            <!-- <p class="control">
+                <button class="button is-small is-info has-text-weight-bold is-fullwidth">
+                    <font-awesome-icon :icon="['fas', 'plus']" class="mr-1"/>
+                    <span>Colunas</span> 
+                </button>
+            </p> -->
+            <p class="control">
+                <button @click="abrirModalTipo()" class="button is-small is-info has-text-weight-bold is-fullwidth">
+                    <font-awesome-icon :icon="['fas', 'plus']" class="mr-1"/>
+                    <span>Tipo</span> 
+                </button>
+            </p>
+            <p class="control">
+                <button @click="abrirModalUF()" class="button is-small is-info has-text-weight-bold is-fullwidth">
+                    <font-awesome-icon :icon="['fas', 'plus']" class="mr-1"/>
+                    <span>UF</span> 
+                </button>
+            </p>
+            <p class="control">
+                <button @click="abrirModalCadastrar" class="button is-small is-info has-text-weight-bold is-fullwidth">
+                    <font-awesome-icon :icon="['fas', 'plus']" class="mr-1"/>
+                    <span>Cliente</span> 
+                </button>
+            </p>
+        </div>
     </div>
     <!--Tabela home de clientes-->
     <div class="table-container p-0 tabelaHome">
         <table class="table is-narrow is-bordered is-hoverable is-fullwidth">
             <thead>
                 <tr class="has-background-dark has-text-light">
-                    <th class="has-text-centered has-text-light">Id</th>
-                    <th class="has-text-centered has-text-light">Cadastro</th>
-                    <th class="has-text-centered has-text-light coluna-nome">Nome</th>
-                    <th class="has-text-centered has-text-light">Tipo
-                        <font-awesome-icon @click="abrirModalTipo()" :icon="['fas', 'plus']" class="has-background-info is-clickable"/>                    
+                    <th v-for="(tableHomeHeader, index) in tableHomeHeaders" :key="index" 
+                        class="has-text-centered has-text-light">
+                        {{ tableHomeHeader }}
                     </th>
-                    <th class="has-text-centered has-text-light">CNPJ</th>
-                    <th class="has-text-centered has-text-light">Email</th>
-                    <th class="has-text-centered has-text-light">Telefone</th>
-                    <th class="has-text-centered has-text-light" hidden>Endereço</th>
-                    <th class="has-text-centered has-text-light" hidden>Bairro</th>
-                    <th class="has-text-centered has-text-light">Cidade</th>
-                    <th class="has-text-centered has-text-light">UF
-                        <font-awesome-icon @click="abrirModalUF()" :icon="['fas', 'plus']" class="has-background-info is-clickable"/> 
-                    </th>
-                    <th class="has-text-centered has-text-light">Ação</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="cliente in filtroPesquisaNomeHome" :key="cliente.id"
+                <tr v-for="cliente in filtroPesquisaNomeHome.sort((a, b) => (parseInt(a.id) > parseInt(b.id)) ? 1 : -1)" :key="cliente.id"
                     class="has-text-centered is-vcentered">
                     <td class="is-vcentered">{{ cliente.id }}</td>
                     <td class="is-vcentered">{{ formatarDataBr(cliente.cadastro) }} </td>
@@ -601,8 +632,8 @@ td, th {
                     <td class="is-vcentered">{{ cliente.cnpj }}</td>
                     <td class="is-vcentered">{{ cliente.email }}</td>
                     <td class="is-vcentered">{{ cliente.telefone }}</td>
-                    <td class="is-vcentered" hidden>{{ cliente.endereco }}</td>
-                    <td class="is-vcentered" hidden>{{ cliente.bairro }}</td>
+                    <td class="is-vcentered">{{ cliente.endereco }}</td>
+                    <td class="is-vcentered">{{ cliente.bairro }}</td>
                     <td class="is-vcentered">{{ cliente.cidade }}</td>
                     <td class="is-vcentered">{{ cliente.uf }}</td>
                     <td class="is-vcentered">
@@ -820,7 +851,7 @@ td, th {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="tipo in filtroPesquisaTipo" :key="tipo.id" class="has-text-centered">
+                <tr v-for="tipo in filtroPesquisaTipo.sort((a, b) => (parseInt(a.id) > parseInt(b.id)) ? 1 : -1)" :key="tipo.id" class="has-text-centered">
                     <td class="is-vcentered" >{{ tipo.id }}</td>
                     <td class="is-vcentered">{{ tipo.nome }}</td>
                     <td class="is-vcentered">
@@ -875,7 +906,7 @@ td, th {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="uf in filtroPesquisaUF" :key="uf.id" class="has-text-centered">
+                <tr v-for="uf in filtroPesquisaUF.sort((a, b) => (parseInt(a.id) > parseInt(b.id)) ? 1 : -1)" :key="uf.id" class="has-text-centered">
                     <td class="is-vcentered" >{{ uf.id }}</td>
                     <td class="is-vcentered">{{ uf.nome }}</td>
                     <td class="is-vcentered">

@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-// import { useStoreUsers } from '@/stores/UserStore'
+import { useStoreUsers } from '@/stores/UserStore'
 
 const routes = [
   {
@@ -29,13 +29,13 @@ const router = createRouter({
   routes
 })
 
-// router.beforeEach((to, from, next) => {
-//   const userStore = useStoreUsers();
-//   if (!userStore.userState.isLogado && to.name != 'Login') {
-//     next({name: 'Login'});
-//   } else {
-//     next();
-//   }
-// });
+router.beforeEach((to, from, next) => {
+  const userStore = useStoreUsers();
+  if (!userStore.userState.isLogado && to.name != 'Login') {
+    next({name: 'Login'});
+  } else {
+    next();
+  }
+});
 
 export default router
