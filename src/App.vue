@@ -9,13 +9,9 @@ const userStore = useStoreUsers();
 
 </script>
 
-  <style>
-  
-  body {
-    font-size: 0.8rem;
-  }
-  
-  </style>
+<style>
+
+</style>
 
 <template>
 
