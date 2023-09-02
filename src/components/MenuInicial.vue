@@ -27,6 +27,13 @@ function fazerLogOut() {
 
 <style>
 
+.menu-navbar {
+  position: fixed;
+  top: 0; 
+  width: 100%;
+  z-index: 2;
+}
+
 .usuario-logado {
   border: 1px solid gray;
   border-radius: 1rem;
@@ -34,11 +41,15 @@ function fazerLogOut() {
   margin: 0.5rem 0;
 }
 
+.navbar-item:active {
+  background-color: white;
+}
+
 </style>
 
 <template>
 
-    <section>
+    <section class="menu-navbar">
       <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
         <div class="navbar-brand">
           <router-link :to="{name: 'Home'}" class="navbar-item">
@@ -60,8 +71,8 @@ function fazerLogOut() {
             <router-link to="" class="navbar-item">Relatórios</router-link>
           </div>
           <div class="navbar-end mr-4 is-align-items-center">
-            <span class="usuario-logado navbar-item">{{ userStore.user.email }}</span>
-            <button v-show="userStore.userState.isLogado" @click="fazerLogOut" class="button is-small is-info navbar-item ml-4">Sign Out</button>
+            <span class="usuario-logado navbar-item mt-1">{{ userStore.user.email }}</span>
+            <button v-show="userStore.userState.isLogado" @click="fazerLogOut" class="button is-info navbar-item ml-4">Sign Out</button>
           </div>
         </div>
       </nav>
