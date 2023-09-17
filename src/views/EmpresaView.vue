@@ -9,8 +9,8 @@ import { vMaska } from 'maska'
 import { Block, Notify, Confirm, Loading } from 'notiflix';
 import { formatarDataBr } from '../modules'
 
-const modalFornecedores = ref({
-    idFornecedor: null,
+const modalEmpresa = ref({
+    idEmpresa: null,
     nome: null,
     tipo: null,
     cnpj: null,
@@ -43,7 +43,7 @@ const cols = [
     "UF",
     "Ação"
 ];
-const colsVisibleStorage = "R0LkbqL2WdcMf8TnL5";
+const colsVisibleStorage = "R0LkbqL2WdcMf8TnL6";
 const colsVisible = ref([]);
 const colsVisibleSelector = ref(false);
 
@@ -53,7 +53,7 @@ watch(colsVisible, (n) => {
 
 function atualizarDadosHome() {
     dadosTabelaHome.value = [];
-    const query = getDocs(collection(db, 'fornecedores'));
+    const query = getDocs(collection(db, 'empresas'));
     query.then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
             const dataResult = doc.data();
@@ -89,7 +89,7 @@ function atualizarDadosUF() {
 }
 
 onMounted(() => {
-    // Carrega os dados dos fornecedores na tabela Home
+    // Carrega os dados na tabela Home
     atualizarDadosHome();
     atualizarDadosTipo();
     atualizarDadosUF();
@@ -103,15 +103,15 @@ const filtroPesquisaNomeHome = computed(() => {
 
 // Excluir um registro do banco de dados.
 // Confirm.merge({plainText: false})
-function excluirRegistro(fornecedor) {
+function excluirRegistro(empresa) {
     Confirm.show(
         "Confirmação de exclusão",
-        `Deseja excluir o fornecedor <b>${fornecedor.nome}</b>?`,
+        `Deseja excluir o cliente <b>${empresa.nome}</b>?`,
         "Sim",
         "Cancelar",
         () => {
             Loading.pulse();
-            const docRef = doc(db, 'fornecedores', fornecedor.id);
+            const docRef = doc(db, 'empresas', empresa.id);
             deleteDoc(docRef).then(() => {
                 atualizarDadosHome();
                 Loading.remove();
@@ -130,20 +130,20 @@ const tituloFormulario = ref("");
 const mostrarBtnFormulario = ref(false)
 
 // Abre o modal aterar ao clicar no botão editar do Home
-function abrirModalAlterar(fornecedor) {
+function abrirModalAlterar(empresa) {
     isModalCadastrarEditarAtivo.value = true
-    tituloFormulario.value = "Alteração dos dados do fornecedor"
+    tituloFormulario.value = "Alteração dos dados da empresa"
     mostrarBtnFormulario.value = false
-    modalFornecedores.value.idFornecedor = fornecedor.id,
-    modalFornecedores.value.nome = fornecedor.nome,
-    modalFornecedores.value.tipo = fornecedor.tipo,
-    modalFornecedores.value.cnpj = fornecedor.cnpj,
-    modalFornecedores.value.email = fornecedor.email,
-    modalFornecedores.value.telefone = fornecedor.telefone,
-    modalFornecedores.value.endereco = fornecedor.endereco,
-    modalFornecedores.value.bairro = fornecedor.bairro,
-    modalFornecedores.value.cidade = fornecedor.cidade,
-    modalFornecedores.value.uf = fornecedor.uf
+    modalEmpresa.value.idEmpresa = empresa.id,
+    modalEmpresa.value.nome = empresa.nome,
+    modalEmpresa.value.tipo = empresa.tipo,
+    modalEmpresa.value.cnpj = empresa.cnpj,
+    modalEmpresa.value.email = empresa.email,
+    modalEmpresa.value.telefone = empresa.telefone,
+    modalEmpresa.value.endereco = empresa.endereco,
+    modalEmpresa.value.bairro = empresa.bairro,
+    modalEmpresa.value.cidade = empresa.cidade,
+    modalEmpresa.value.uf = empresa.uf
 }
 
 const ispopUpConfirmationAtivo = ref(false)
@@ -152,8 +152,8 @@ const ispopUpConfirmationAtivo = ref(false)
 function alterarRegistro() {
     Block.pulse();
     const nomeExiste = dadosTabelaHome.value.some((d) => {
-        if(modalFornecedores.value.idFornecedor != d.id) {
-            return modalFornecedores.value.nome.toLowerCase() == d.nome.toLowerCase()
+        if(modalEmpresa.value.idEmpresa != d.id) {
+            return modalEmpresa.value.nome.toLowerCase() == d.nome.toLowerCase()
         }
     });
     if(nomeExiste) {
@@ -161,17 +161,17 @@ function alterarRegistro() {
         Block.remove();
         return;
     } else {
-        const docRef = doc(db, 'fornecedores', modalFornecedores.value.idFornecedor)
+        const docRef = doc(db, 'empresas', modalEmpresa.value.idEmpresa)
         updateDoc(docRef, {
-            nome: modalFornecedores.value.nome?? null,
-            tipo: modalFornecedores.value.tipo?? null,
-            cnpj: modalFornecedores.value.cnpj?? null,
-            email: modalFornecedores.value.email?? null,
-            telefone: modalFornecedores.value.telefone?? null,
-            endereco: modalFornecedores.value.endereco?? null,
-            bairro: modalFornecedores.value.bairro?? null, 
-            cidade: modalFornecedores.value.cidade?? null,
-            uf: modalFornecedores.value.uf?? null
+            nome: modalEmpresa.value.nome?? null,
+            tipo: modalEmpresa.value.tipo?? null,
+            cnpj: modalEmpresa.value.cnpj?? null,
+            email: modalEmpresa.value.email?? null,
+            telefone: modalEmpresa.value.telefone?? null,
+            endereco: modalEmpresa.value.endereco?? null,
+            bairro: modalEmpresa.value.bairro?? null, 
+            cidade: modalEmpresa.value.cidade?? null,
+            uf: modalEmpresa.value.uf?? null
         })
         .then(() => {
             dadosTabelaHome.value = {};
@@ -190,15 +190,15 @@ function limparInputPesquisa() {
 
 // Abre o formulário Cadastrar ao clicar no botão Cadastrar do Home
 function abrirModalCadastrar() {
-    modalFornecedores.value = {};
-    tituloFormulario.value = "Cadastro de novo fornecedor"
+    modalEmpresa.value = {};
+    tituloFormulario.value = "Cadastro de nova empresa"
     mostrarBtnFormulario.value = true
     isModalCadastrarEditarAtivo.value = true;
 }
 
 // Faz a validação do campo nome do formulário
 const isNomeValido = computed(() => {
-    if (modalFornecedores.value.nome == null || modalFornecedores.value.nome == 0) return false
+    if (modalEmpresa.value.nome == null || modalEmpresa.value.nome == 0) return false
     return true 
 }) 
 
@@ -227,29 +227,29 @@ function atualizarTelefoneVmaska(novoValor) {
 function adicionarRegistro() {
     Block.pulse();
     const nomeExiste = dadosTabelaHome.value.some((d) => {
-        return modalFornecedores.value.nome.toLowerCase() == d.nome.toLowerCase()
+        return modalEmpresa.value.nome.toLowerCase() == d.nome.toLowerCase()
     });
     if(nomeExiste) {
         Notify.failure('Nome já existente!')
         Block.remove();
         return;
     } else {
-        const docIndice = doc(db, 'indices', 'fornecedor');
+        const docIndice = doc(db, 'indices', 'empresa');
         getDoc(docIndice).then((d) => {
-            let idFornecedor = d.data().ultimo;
-            idFornecedor++;
-            setDoc(docIndice, {ultimo: idFornecedor});
-            setDoc(doc(db, 'fornecedores', idFornecedor.toString()), {
+            let idEmpresa = d.data().ultimo;
+            idEmpresa++;
+            setDoc(docIndice, {ultimo: idEmpresa});
+            setDoc(doc(db, 'empresas', idEmpresa.toString()), {
                 cadastro: String(new Date()),
-                nome: modalFornecedores.value.nome ?? "",
-                tipo: modalFornecedores.value.tipo ?? "",
-                cnpj: modalFornecedores.value.cnpj ?? "",
-                email: modalFornecedores.value.email ?? "",
-                telefone: modalFornecedores.value.telefone ?? "",
-                endereco: modalFornecedores.value.endereco ?? "",
-                bairro: modalFornecedores.value.bairro ?? "", 
-                cidade: modalFornecedores.value.cidade ?? "",
-                uf: modalFornecedores.value.uf ?? ""
+                nome: modalEmpresa.value.nome ?? "",
+                tipo: modalEmpresa.value.tipo ?? "",
+                cnpj: modalEmpresa.value.cnpj ?? "",
+                email: modalEmpresa.value.email ?? "",
+                telefone: modalEmpresa.value.telefone ?? "",
+                endereco: modalEmpresa.value.endereco ?? "",
+                bairro: modalEmpresa.value.bairro ?? "", 
+                cidade: modalEmpresa.value.cidade ?? "",
+                uf: modalEmpresa.value.uf ?? ""
             }).then(() => {
                 dadosTabelaHome.value = {};
                 inputPesquisar.value = "";
@@ -257,7 +257,7 @@ function adicionarRegistro() {
                 isModalCadastrarEditarAtivo.value = false;
                 Notify.success("Registro inserido com sucesso!");
             }).catch(() => {
-                Notify.danger("Falha ao registrar o fornecedor")
+                Notify.danger("Falha ao registrar a empresa")
             }).finally(() => {
                 Block.remove();
             })
@@ -301,10 +301,6 @@ function limparRegistro() {
 @import 'bulma-extensions/dist/css/bulma-extensions.min.css';
 
 
-.container-principal-fornecedores {
-    height: 100vh;
-}
-
 td, th {
     text-align: center;
     /* white-space: nowrap; */
@@ -315,22 +311,21 @@ td, th {
 }
 
 .area-pesquisa {
-    position: relative;
+    /* position: relative;
     top: 2.2rem;
-    left: 0;
+    left: 0; */
     width: 100%;
-    padding: 1.2rem;
-    margin-bottom: 2rem;
+    margin: 1.5rem 0;
     align-items: center;
 }
 
 </style>
 
 <template>
-<!--Home área de filtro + tabela fornecedores-->
-<div class="mx-4 my-4 container-principal-fornecedores">
+<!--Home área de filtro + tabela clientes-->
+<div class="container-principal-empresas">
     <!--Campo de filtro da tabela + botão cadastrar-->
-    <div class="field is-grouped area-pesquisa">
+    <div class="field is-grouped area-pesquisa is-align-items-center">
         <label class="label mr-3 has-text-light">Nome: </label>
         <p class="control is-expanded">
             <input type="text" class="input" v-model="inputPesquisar">
@@ -355,13 +350,13 @@ td, th {
             </div>
             <p class="control">
                 <button @click="abrirModalCadastrar" class="button is-info has-text-weight-bold is-fullwidth">
-                    <font-awesome-icon :icon="['fas', 'plus']" class="mr-1"/>
-                    <span>Fornecedor</span> 
+                    <font-awesome-icon :icon="['fa', 'fa-floppy-disk']" class="mr-1"/>
+                    <span>Empresa</span> 
                 </button>
             </p>
         </div>
     </div>
-    <!--Tabela home de fornecedores-->
+    <!--Tabela home de clientes-->
     <div style="max-height: calc(100vh - 9rem); overflow: scroll;">
         <table class="table is-narrow is-bordered is-hoverable is-fullwidth">
             <thead style="position: sticky; top: 0; z-index: 2;">
@@ -371,28 +366,28 @@ td, th {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="fornecedor in filtroPesquisaNomeHome.sort((a, b) => (parseInt(a.id) > parseInt(b.id)) ? 1 : -1)" :key="fornecedor.id"
+                <tr v-for="empresa in filtroPesquisaNomeHome.sort((a, b) => (parseInt(a.id) > parseInt(b.id)) ? 1 : -1)" :key="empresa.id"
                     class="has-text-centered is-vcentered">
-                    <td class="is-vcentered" v-show="colsVisible.indexOf('Id') >= 0">{{ fornecedor.id }}</td>
-                    <td class="is-vcentered" v-show="colsVisible.indexOf('Cadastro') >= 0">{{ formatarDataBr(fornecedor.cadastro) }} </td>
-                    <td style="white-space: nowrap;" class="is-vcentered" v-show="colsVisible.indexOf('Nome') >= 0">{{ fornecedor.nome }}</td>
-                    <td class="is-vcentered" v-show="colsVisible.indexOf('Tipo') >= 0">{{ fornecedor.tipo }}</td>
-                    <td class="is-vcentered" v-show="colsVisible.indexOf('CNPJ') >= 0">{{ fornecedor.cnpj }}</td>
-                    <td class="is-vcentered" v-show="colsVisible.indexOf('E-mail') >= 0">{{ fornecedor.email }}</td>
-                    <td class="is-vcentered" v-show="colsVisible.indexOf('Telefone') >= 0">{{ fornecedor.telefone }}</td>
-                    <td class="is-vcentered" v-show="colsVisible.indexOf('Endereço') >= 0">{{ fornecedor.endereco }}</td>
-                    <td class="is-vcentered" v-show="colsVisible.indexOf('Bairro') >= 0">{{ fornecedor.bairro }}</td>
-                    <td class="is-vcentered" v-show="colsVisible.indexOf('Cidade') >= 0">{{ fornecedor.cidade }}</td>
-                    <td class="is-vcentered" v-show="colsVisible.indexOf('UF') >= 0">{{ fornecedor.uf }}</td>
+                    <td class="is-vcentered" v-show="colsVisible.indexOf('Id') >= 0">{{ empresa.id }}</td>
+                    <td class="is-vcentered" v-show="colsVisible.indexOf('Cadastro') >= 0">{{ formatarDataBr(empresa.cadastro) }} </td>
+                    <td style="white-space: nowrap;" class="is-vcentered" v-show="colsVisible.indexOf('Nome') >= 0">{{ empresa.nome }}</td>
+                    <td class="is-vcentered" v-show="colsVisible.indexOf('Tipo') >= 0">{{ empresa.tipo }}</td>
+                    <td class="is-vcentered" v-show="colsVisible.indexOf('CNPJ') >= 0">{{ empresa.cnpj }}</td>
+                    <td class="is-vcentered" v-show="colsVisible.indexOf('E-mail') >= 0">{{ empresa.email }}</td>
+                    <td class="is-vcentered" v-show="colsVisible.indexOf('Telefone') >= 0">{{ empresa.telefone }}</td>
+                    <td class="is-vcentered" v-show="colsVisible.indexOf('Endereço') >= 0">{{ empresa.endereco }}</td>
+                    <td class="is-vcentered" v-show="colsVisible.indexOf('Bairro') >= 0">{{ empresa.bairro }}</td>
+                    <td class="is-vcentered" v-show="colsVisible.indexOf('Cidade') >= 0">{{ empresa.cidade }}</td>
+                    <td class="is-vcentered" v-show="colsVisible.indexOf('UF') >= 0">{{ empresa.uf }}</td>
                     <td class="is-vcentered" v-show="colsVisible.indexOf('Ação') >= 0">
                         <div class="field is-grouped">
                             <p class="control">
-                                <button @click="abrirModalAlterar(fornecedor)" class="button is-warning btn-tabela">
+                                <button @click="abrirModalAlterar(empresa)" class="button is-warning btn-tabela">
                                     <font-awesome-icon :icon="['fas', 'pen']"/>
                                 </button>                                                                                 
                             </p>
                             <p class="control">
-                                <button @click="excluirRegistro(fornecedor)" class="button is-danger btn-tabela">
+                                <button @click="excluirRegistro(empresa)" class="button is-danger btn-tabela">
                                     <font-awesome-icon :icon="['fas', 'trash']"/>
                                 </button>
                             </p>
@@ -414,14 +409,14 @@ td, th {
                 <div class="field">
                     <label class="label ">Id</label>
                     <div class="control">
-                        <input v-model="modalFornecedores.idFornecedor" type="text" class="input  is-info has-background-white" disabled>
+                        <input v-model="modalEmpresa.idEmpresa" type="text" class="input  is-info has-background-white" disabled>
                     </div>
                 </div>
                 <!--Nome-->
                 <div class="field">
                     <label class="label ">Nome</label>
                     <div class="control">
-                        <input v-model="modalFornecedores.nome" type="text" :class="{'is-danger': !isNomeValido}" class="input is-info ">
+                        <input v-model="modalEmpresa.nome" type="text" :class="{'is-danger': !isNomeValido}" class="input is-info ">
                     </div>
                     <p v-show="!isNomeValido" class="help is-danger">Campo obrigatório : Insira um nome</p>
                 </div>
@@ -429,7 +424,7 @@ td, th {
                 <div class="field">
                     <label class="label ">Tipo</label>
                     <div class="control select  select is-info  is-hovered is-fullwidth"> 
-                        <select v-model="modalFornecedores.tipo">
+                        <select v-model="modalEmpresa.tipo">
                             <option v-for="selectDataTipo in selectDatasTipo" :key="selectDataTipo.id">{{ selectDataTipo.nome }}</option>
                         </select>
                     </div>
@@ -438,14 +433,14 @@ td, th {
                 <div class="field">
                     <label class="label ">CPF / CNPJ</label>
                     <div class="control">
-                        <input v-model="modalFornecedores.cnpj" @input="atualizarCnpjVmaska($event.target.value)" type="text" class="input is-info " v-maska :data-maska="vMaskaCnpj">
+                        <input v-model="modalEmpresa.cnpj" @input="atualizarCnpjVmaska($event.target.value)" type="text" class="input is-info " v-maska :data-maska="vMaskaCnpj">
                     </div>
                 </div>
                 <!--Email-->
                 <div class="field">
                     <label class="label ">E-mail</label>
                     <div class="control">
-                        <input v-model="modalFornecedores.email" type="email" class="input is-info " placeholder="exemple@gmail.com" >
+                        <input v-model="modalEmpresa.email" type="email" class="input is-info " placeholder="exemple@gmail.com" >
                     </div>
                 </div>
             </div>
@@ -455,35 +450,35 @@ td, th {
                 <div class="field"> 
                     <label class="label ">Telefone</label>
                     <div class="control">
-                        <input v-model="modalFornecedores.telefone" @input="atualizarTelefoneVmaska($event.target.value)" type="tel" class="input is-info " placeholder="(xx) xxxxx-xxxx" v-maska :data-maska="vMaskaTelefone">
+                        <input v-model="modalEmpresa.telefone" @input="atualizarTelefoneVmaska($event.target.value)" type="tel" class="input is-info " placeholder="(xx) xxxxx-xxxx" v-maska :data-maska="vMaskaTelefone">
                     </div>
                 </div>
                 <!--Endereço-->
                 <div class="field"> 
                     <label class="label ">Endereço</label>
                     <div class="control">
-                        <input v-model="modalFornecedores.endereco" type="text" class="input is-info ">
+                        <input v-model="modalEmpresa.endereco" type="text" class="input is-info ">
                     </div>
                 </div>
                 <!--Bairro-->
                 <div class="field"> 
                     <label class="label ">Bairro</label>
                     <div class="control">
-                        <input v-model="modalFornecedores.bairro" type="text" class="input is-info ">
+                        <input v-model="modalEmpresa.bairro" type="text" class="input is-info ">
                     </div>
                 </div>
                 <!--Cidade-->
                 <div class="field"> 
                     <label class="label ">Cidade</label>
                     <div class="control">
-                        <input v-model="modalFornecedores.cidade" type="text" class="input is-info ">
+                        <input v-model="modalEmpresa.cidade" type="text" class="input is-info ">
                     </div>
                 </div>
                 <!--UF-->
                 <div class="field"> 
                     <label class="label  ">UF</label>
                     <div class="select is-info  is-fullwidth">
-                        <select v-model="modalFornecedores.uf">
+                        <select v-model="modalEmpresa.uf">
                             <option v-for="selectDataUF in selectDatasUF" :key="selectDataUF.id">{{ selectDataUF.nome }}</option>
                         </select>
                     </div>
@@ -509,23 +504,23 @@ td, th {
                     <tbody class="has-text-centered">
                         <tr>
                             <td class="td-title">Id</td>
-                            <td class="td-data">{{ modalFornecedores.idFornecedor }}</td>
+                            <td class="td-data">{{ modalEmpresa.idEmpresa }}</td>
                         </tr>
                         <tr>
                             <td class="td-title">Nome</td>
-                            <td class="td-data">{{ modalFornecedores.nome }}</td>
+                            <td class="td-data">{{ modalEmpresa.nome }}</td>
                         </tr>
                         <tr>
                             <td class="td-title">Tipo</td>
-                            <td class="td-data">{{ modalFornecedores.tipo }}</td>
+                            <td class="td-data">{{ modalEmpresa.tipo }}</td>
                         </tr>
                         <tr>
                             <td class="td-title">CNPJ</td>
-                            <td class="td-data">{{ modalFornecedores.cnpj }}</td>
+                            <td class="td-data">{{ modalEmpresa.cnpj }}</td>
                         </tr>
                         <tr>
                             <td class="td-title">E-mail</td>
-                            <td class="td-data">{{ modalFornecedores.email }}</td>
+                            <td class="td-data">{{ modalEmpresa.email }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -536,23 +531,23 @@ td, th {
                     <tbody class="has-text-centered">
                         <tr>
                             <td class="td-title">Telefone</td>
-                            <td class="td-data">{{ modalFornecedores.telefone }}</td>
+                            <td class="td-data">{{ modalEmpresa.telefone }}</td>
                         </tr>
                         <tr>
                             <td class="td-title">Endereço</td>
-                            <td class="td-data">{{ modalFornecedores.endereco }}</td>
+                            <td class="td-data">{{ modalEmpresa.endereco }}</td>
                         </tr>
                         <tr>
                             <td class="td-title">Bairro</td>
-                            <td class="td-data">{{ modalFornecedores.bairro }}</td>
+                            <td class="td-data">{{ modalEmpresa.bairro }}</td>
                         </tr>
                         <tr>
                             <td class="td-title">Cidade</td>
-                            <td class="td-data">{{ modalFornecedores.cidade }}</td>
+                            <td class="td-data">{{ modalEmpresa.cidade }}</td>
                         </tr>
                         <tr>
                             <td class="td-title">UF</td>
-                            <td class="td-data">{{ modalFornecedores.uf }}</td>
+                            <td class="td-data">{{ modalEmpresa.uf }}</td>
                         </tr>
                     </tbody>
                 </table>

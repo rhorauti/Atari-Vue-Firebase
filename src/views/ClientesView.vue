@@ -1,17 +1,16 @@
 <script setup>
 
 import ModalCard from '@/components/ModalCard.vue'
-import ModalCardUF from '@/components/ModalCardUF.vue'
 import PopUpConfirmation from '@/components/PopUpConfirmation.vue'
 import { collection, getDocs, setDoc, deleteDoc, doc, updateDoc, getDoc } from 'firebase/firestore'
 import { db } from '@/firebase'
 import { ref, onMounted, computed, watch } from 'vue'
 import { vMaska } from 'maska'
 import { Block, Notify, Confirm, Loading } from 'notiflix';
-import ModalCardTipo from '@/components/ModalCardTipo.vue'
+import { formatarDataBr } from '../modules'
 
 const modalClientes = ref({
-    id: null,
+    idCliente: null,
     nome: null,
     tipo: null,
     cnpj: null,
@@ -102,21 +101,6 @@ const filtroPesquisaNomeHome = computed(() => {
     return dadosTabelaHome.value.filter(dado => dado.nome.toLowerCase().includes(inputPesquisar.value.toLowerCase()));
 })
 
-function formatarDataBr(data) {
-    if(!data) return;
-    const partes = data.split(' ');
-    const dia = parseInt(partes[2]);
-    const meses = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const mes = parseInt(meses.indexOf(partes[1])) + 1;
-    const ano = parseInt(partes[3]);
-    const dataFormatada = new Date(ano, mes, dia);
-    if(meses.indexOf(partes[1] >= 0 && partes[1] < 9)) {
-        return dataFormatada.getDate() + '/0' + dataFormatada.getMonth() + '/' + dataFormatada.getFullYear();
-    } else {
-        return dataFormatada.getDate() + '/' + dataFormatada.getMonth() + '/' + dataFormatada.getFullYear();
-    }
-}
-
 // Excluir um registro do banco de dados.
 // Confirm.merge({plainText: false})
 function excluirRegistro(cliente) {
@@ -150,7 +134,7 @@ function abrirModalAlterar(cliente) {
     isModalCadastrarEditarAtivo.value = true
     tituloFormulario.value = "Alteração dos dados do cliente"
     mostrarBtnFormulario.value = false
-    modalClientes.value.id = cliente.id,
+    modalClientes.value.idCliente = cliente.id,
     modalClientes.value.nome = cliente.nome,
     modalClientes.value.tipo = cliente.tipo,
     modalClientes.value.cnpj = cliente.cnpj,
@@ -166,18 +150,18 @@ const ispopUpConfirmationAtivo = ref(false)
 
 // Envia os dados de alteração para o firebase
 function alterarRegistro() {
-    Block.pulse(".tabelaHome");
+    Block.pulse();
     const nomeExiste = dadosTabelaHome.value.some((d) => {
-        if(modalClientes.value.id != d.id) {
+        if(modalClientes.value.idCliente != d.id) {
             return modalClientes.value.nome.toLowerCase() == d.nome.toLowerCase()
         }
     });
     if(nomeExiste) {
         Notify.failure('Nome já existente!')
-        Block.remove(".tabelaHome");
+        Block.remove();
         return;
     } else {
-        const docRef = doc(db, 'clientes', modalClientes.value.id)
+        const docRef = doc(db, 'clientes', modalClientes.value.idCliente)
         updateDoc(docRef, {
             nome: modalClientes.value.nome?? null,
             tipo: modalClientes.value.tipo?? null,
@@ -192,7 +176,7 @@ function alterarRegistro() {
         .then(() => {
             dadosTabelaHome.value = {};
             atualizarDadosHome();
-            Block.remove(".tabelaHome");
+            Block.remove();
             ispopUpConfirmationAtivo.value = false;
             isModalCadastrarEditarAtivo.value = false;
             Notify.success("Registro alterado com sucesso!")
@@ -241,13 +225,13 @@ function atualizarTelefoneVmaska(novoValor) {
 
 // Adiciona um novo registro no firebase.
 function adicionarRegistro() {
-    Block.pulse(".tabelaHome");
+    Block.pulse();
     const nomeExiste = dadosTabelaHome.value.some((d) => {
         return modalClientes.value.nome.toLowerCase() == d.nome.toLowerCase()
     });
     if(nomeExiste) {
         Notify.failure('Nome já existente!')
-        Block.remove(".tabelaHome");
+        Block.remove();
         return;
     } else {
         const docIndice = doc(db, 'indices', 'cliente');
@@ -275,7 +259,7 @@ function adicionarRegistro() {
             }).catch(() => {
                 Notify.danger("Falha ao registrar o cliente")
             }).finally(() => {
-                Block.remove(".tabelaHome");
+                Block.remove();
             })
         })
     }
@@ -308,19 +292,6 @@ function limparRegistro() {
     )
 }
 
-const isModalTipoAtivo = ref(false);
-
-// Abre o modal de tipo de cliente 
-function abrirModalTipo() {
-    isModalTipoAtivo.value = true;
-}
-
-const isModalUFAtivo = ref(false);
-
-function abrirModalUF() {
-    isModalUFAtivo.value = true;
-}
-
 </script>
 
 
@@ -329,6 +300,10 @@ function abrirModalUF() {
 @import 'bulma/css/bulma.min.css';
 @import 'bulma-extensions/dist/css/bulma-extensions.min.css';
 
+
+.container-principal-clientes {
+    height: 100vh;
+}
 
 td, th {
     text-align: center;
@@ -339,9 +314,6 @@ td, th {
     justify-content: center;
 }
 
-.btn-tabela {
-    font-size: 0.9rem;
-}
 
 .area-pesquisa {
     position: relative;
@@ -351,16 +323,15 @@ td, th {
     padding: 1.2rem;
     margin-bottom: 2rem;
     align-items: center;
-    background-color: linear-gradient( #100d33, #5c5b69);
 }
 
 </style>
 
 <template>
 <!--Home área de filtro + tabela clientes-->
-<div class="mx-4 my-4">
+<div class="mx-4 my-4 container-principal-clientes">
     <!--Campo de filtro da tabela + botão cadastrar-->
-    <div class="field is-grouped area-pesquisa">
+    <div class="field is-grouped area-pesquisa is-align-items-center">
         <label class="label mr-3 has-text-light">Nome: </label>
         <p class="control is-expanded">
             <input type="text" class="input" v-model="inputPesquisar">
@@ -378,26 +349,16 @@ td, th {
                     <span>Colunas</span>
                 </button>
                 <div style="position: absolute; display: flex; flex-direction: column; top: 0rem; z-index: 100; border: 1px solid #777; padding: 1.2rem; border-radius: 1rem; background-color: #fff; right: 7.2rem; width: 8rem;" v-show="colsVisibleSelector">
-                    <label class="checkbox" v-for="col, colunasid in cols" :key="colunasid">
-                        <input type="checkbox" :value="col" v-model="colsVisible" :disabled="col=='Id' || col=='Nome'"/>{{ col }}
+                    <label class="checkbox has-text-dark" v-for="col, colunasid in cols" :key="colunasid">
+                        <input class="mr-2" type="checkbox" :value="col" v-model="colsVisible" :disabled="col=='Id' || col=='Nome'"/>{{ col }}
                     </label>
                 </div>
             </div>
             <p class="control">
-                <button @click="abrirModalTipo()" class="button is-info has-text-weight-bold is-fullwidth">
-                    <span class="icon"><font-awesome-icon :icon="['fas', 'plus']"/></span>
-                    <span>Tipo</span> 
-                </button>
-            </p>
-            <p class="control">
-                <button @click="abrirModalUF()" class="button is-info has-text-weight-bold is-fullwidth">
-                    <span class="icon"><font-awesome-icon :icon="['fas', 'plus']"/></span>
-                    <span>UF</span> 
-                </button>
-            </p>
-            <p class="control">
                 <button @click="abrirModalCadastrar" class="button is-info has-text-weight-bold is-fullwidth">
-                    <font-awesome-icon :icon="['fas', 'plus']" class="mr-1"/>
+                    <span class="icon">
+                        <font-awesome-icon :icon="['fa', 'fa-floppy-disk']" class="mr-1"/>
+                    </span>
                     <span>Cliente</span> 
                 </button>
             </p>
@@ -456,7 +417,7 @@ td, th {
                 <div class="field">
                     <label class="label ">Id</label>
                     <div class="control">
-                        <input v-model="modalClientes.id" type="text" class="input  is-info has-background-white" disabled>
+                        <input v-model="modalClientes.idCliente" type="text" class="input  is-info has-background-white" disabled>
                     </div>
                 </div>
                 <!--Nome-->
@@ -551,7 +512,7 @@ td, th {
                     <tbody class="has-text-centered">
                         <tr>
                             <td class="td-title">Id</td>
-                            <td class="td-data">{{ modalClientes.id }}</td>
+                            <td class="td-data">{{ modalClientes.idCliente }}</td>
                         </tr>
                         <tr>
                             <td class="td-title">Nome</td>
@@ -612,10 +573,6 @@ td, th {
         </div>
     </template>
 </PopUpConfirmation>
-
-<ModalCardTipo :isModalTipoAtivo="isModalTipoAtivo" @closeModalCardTipo="isModalTipoAtivo = false"></ModalCardTipo>
-
-<ModalCardUF :isModalUFAtivo="isModalUFAtivo" @closeModalCardUF="isModalUFAtivo = false"></ModalCardUF>
 
 </template>
 

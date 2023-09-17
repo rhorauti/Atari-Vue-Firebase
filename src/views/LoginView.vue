@@ -103,6 +103,7 @@ function validarEmail() {
     sendEmailVerification(user, actionSettings).then(() => {
         limparCamposFormulario();
         isUsuarioCriado.value = false;
+        window.localStorage.setItem('usuarioRegistrado', JSON.stringify(email.value));
         Notify.success('E-mail enviado para validação');
     }).catch(() => {
         Notify.failure('Erro ao enviar e-mail de validação!');
@@ -171,6 +172,7 @@ function redefinirSenha() {
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        height: 100vh;
     }
 
     .help{
@@ -189,8 +191,9 @@ function redefinirSenha() {
 
 <template>
 <div v-show="!isUsuarioCriado" id="container-principal-login-form">
+    <div id="background-login"></div>
     <div>
-        <img src="../img/atari.png" alt="" width="100">
+        <img src="../img/logo.png" alt="" width="50">
     </div>
     <div class="field login-form" style="width: 17rem;">
         <label for="" class="label has-text-centered has-text-light is-size-5">{{ (!isNovoUsuario) ? 'Login' : 'Novo Usuário' }}</label>
@@ -213,7 +216,7 @@ function redefinirSenha() {
                     <span class="icon is-left">
                         <font-awesome-icon :icon="['fas', 'lock']"/>
                     </span>
-                    <span class="icon is-small is-right" @click="isNotShowPassword = !isNotShowPassword">
+                    <span class="icon is-small is-right" @click="isNotShowPassword = !isNotShowPassword" style="pointer-events: all;">
                         <font-awesome-icon :icon="(isNotShowPassword) ? ['fas', 'eye-slash'] : ['fas', 'eye']"/>
                     </span>
                 </p>
@@ -227,7 +230,7 @@ function redefinirSenha() {
                     <span class="icon is-left">
                         <font-awesome-icon :icon="['fas', 'lock']"/>
                     </span>
-                    <span class="icon is-right" @click="isNotShowPassword = !isNotShowPassword">
+                    <span class="icon is-right" @click="isNotShowPassword = !isNotShowPassword" style="pointer-events: all;">
                         <font-awesome-icon :icon="(isNotShowPassword) ? ['fas', 'eye-slash'] : ['fas', 'eye']"/>
                     </span>
                 </p>
@@ -253,29 +256,27 @@ function redefinirSenha() {
         </div>
         <!--Texto que irá aparecer se o usuário não é cadastrado-->
         <div v-show="isNovoUsuario" class="field">
-            <p v-show="isNovoUsuario" class="help mt-2 has-text-centered">
+            <p class="help mt-2 has-text-centered">
                 Nova senha deve ter no mínino 6 caracteres
             </p>
-            <div v-show="isNovoUsuario" class="control mt-3" @click="criarUsuario()">
+            <div class="control mt-3" @click="criarUsuario()">
                 <button class="button is-info is-fullwidth">Criar</button>
             </div>
-            <p v-show="isNovoUsuario" class="help mt-2 has-text-centered">Já possui uma conta? 
+            <p class="help mt-2 has-text-centered">Já possui uma conta? 
                 <span @click="voltarTelaLogin()" class="link-form">
                     Fazer o login
                 </span>
             </p>
         </div>
     </div>
-
-    <div id="background-login"></div>
-
-    <div v-show="isUsuarioCriado" class="has-text-centered caixa-mensagem-validacao">
-        <p class="is-size-5">Email criado: <span class="has-text-weight-bold">{{ storeUsers.user.email }}</span></p>
-        <p class="is-size-6 has-text-danger mt-3 mr-3 mb-2">Seu e-mail não está validado!</p>
-        <p class="is-size-6 has-text-danger mr-3 mb-3">Clique no botão baixo para enviarmos um e-mail de validação.</p>
-        <button @click="validarEmail()" class="button is-info is-medium">Validar e-mail</button>
-    </div>
 </div>
-        
+
+<div v-show="isUsuarioCriado" class="has-text-centered caixa-mensagem-validacao">
+    <p class="is-size-5 has-text-light">Email criado: <span class="has-text-weight-bold has-text-light">{{ storeUsers.user.email }}</span></p>
+    <p class="is-size-6 has-text-danger mt-3 mr-3 mb-2">Seu e-mail não está validado!</p>
+    <p class="is-size-6 has-text-danger mr-3 mb-3">Clique no botão baixo para enviarmos um e-mail de validação.</p>
+    <button @click="validarEmail()" class="button is-info is-medium">Validar e-mail</button>
+</div>
+    
 
 </template>

@@ -22,6 +22,32 @@ const routes = [
     name: 'FornecedoresView',
     component: () => import(/* webpackChunkName: "FornecedoresView" */ '../views/FornecedoresView.vue')
   },
+  {
+    path: '/pedidocompra',
+    name: 'PedidoCompra',
+    component: () => import(/* webpackChunkName: "PedidoCompra" */ '../views/PedidoCompra.vue')
+  },
+  {
+    path: '/produtos',
+    name: 'ProdutosView',
+    component: () => import(/* webpackChunkName: "ProdutosView" */ '../views/ProdutosView.vue')
+  },
+  {
+    path: '/misc',
+    name: 'MiscView',
+    component: () => import(/* webpackChunkName: "MiscView" */ '../views/MiscView.vue'),
+    children: [
+        {
+          path: 'empresas',
+          name: 'EmpresaView',
+          component: () => import(/* webpackChunkName: "EmpresaView" */ '../views/EmpresaView.vue'),
+        },
+    ]
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: '/'
+  }
 ]
 
 const router = createRouter({

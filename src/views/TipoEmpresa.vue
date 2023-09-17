@@ -3,17 +3,10 @@
 import { db } from '@/firebase';
 import { collection, deleteDoc, doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore';
 import { Confirm, Loading, Notify } from 'notiflix';
-import { computed, onMounted, ref, defineProps, defineEmits } from 'vue';
-import ModalCard from '@/components/ModalCard.vue';
+import { computed, onMounted, ref } from 'vue';
 
 const tableHeadersTipo = ['Id', 'Tipo', 'Ação']
 const selectDatasTipo = ref([]);
-
-const props = defineProps({
-    isModalTipoAtivo: Boolean
-})
-
-defineEmits(['closeModalCardTipo']);
 
 function atualizarDadosTipo() {
     selectDatasTipo.value = [];
@@ -152,32 +145,54 @@ function excluirTipo(tipo) {
 
 <style>
 
+td, th {
+    text-align: center;
+    /* white-space: nowrap; */
+} 
+
+.field.is-grouped {
+    justify-content: center;
+}
+
+.area-pesquisa {
+    width: 100%;
+    margin: 1.5rem 0;
+    align-items: center;
+}
+
 </style>
 
 <template>
 
-<ModalCard :is-ativo="props.isModalTipoAtivo" titulo="Tipo de Cliente" @closeModalCard="closeModalCardTipo">
-    <template #body>
-        <div class="control" hidden>
-            <input type="text" class="input is-info" disabled>
-        </div>
-        <!-- <label for="" class="label">Tipo</label> -->
-        <div class="field is-grouped">
-            <p class="control is-expanded">
-                <input type="text" v-model="inputPesquisaTipo" class="input is-info">
-            </p>
-            <p class="control">
-                <button @click="abrirModalCadastrarTipo()" class="button is-info">
-                    <font-awesome-icon :icon="['fas', 'plus']" class="mr-1"/>
-                    <span>Cadastrar</span> 
-                </button>
-            </p>
-        </div>
+<div class="container-principal-tipo">
+    <div class="control" hidden>
+        <input type="text" class="input is-info" disabled>
+    </div>
+    <!-- <label for="" class="label">Tipo</label> -->
+    <div class="field is-grouped area-pesquisa is-align-items-center mb-5">
+        <label class="label mr-3 has-text-light">Tipo: </label>
+        <p class="control is-expanded is-flex">
+            <input type="text" v-model="inputPesquisaTipo" class="input is-info">
+        </p>
+        <p class="control">
+            <button @click="inputPesquisaTipo = '' " class="button is-light is-outlined">
+                <span class="icon"><font-awesome-icon :icon="['fas', 'rotate-right']" /></span>
+                <span>Limpar</span> 
+            </button>
+        </p>
+        <p class="control">
+            <button @click="abrirModalCadastrarTipo()" class="button is-info">
+                <font-awesome-icon :icon="['fa', 'fa-floppy-disk']" class="mr-1"/>
+                <span>Cadastrar</span> 
+            </button>
+        </p>
+    </div>
+    <div style="max-height: calc(100vh - 9rem); overflow: scroll;">
         <table class="table is-bordered is-fullwidth" id="tabela-tipo-cliente">
             <thead>
                 <tr>
                     <th v-for="tableHeader, index in tableHeadersTipo" :key="index" 
-                        class="has-text-centered">
+                        class="has-text-centered has-background-dark has-text-light">
                         {{ tableHeader }}
                     </th>
                 </tr>
@@ -203,11 +218,7 @@ function excluirTipo(tipo) {
                 </tr>
             </tbody>
         </table>
-    </template>
-    <template #footer>
-        <button @click="inputPesquisaTipo = '' " class="button is-warning ml-2">Limpar</button>
-        <button @click="$emit('closeModalCardTipo')" class="button is-danger">Cancelar</button>
-    </template>
-</ModalCard>
+    </div>
+</div>
 
 </template>
