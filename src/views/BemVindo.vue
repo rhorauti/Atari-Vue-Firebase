@@ -39,7 +39,7 @@
                 <div class="box">
                     <router-link :to="{name: 'ClientesView'}" class="button is-info is-medium link-paginas">Clientes</router-link>
                     <router-link :to="{name: 'FornecedoresView'}" class="button is-info is-medium link-paginas">Fornecedores</router-link>
-                    <router-link :to="{name: 'EmpresaView'}" class="button is-info is-medium link-paginas">Atari</router-link>
+                    <router-link :to="{name: 'ProdutosView'}" class="button is-info is-medium link-paginas">Produtos</router-link>
                     <router-link :to="{name: 'PedidoCompra'}" class="button is-info is-medium link-paginas">Pedido de Compras</router-link>
                     <router-link :to="{}" class="button is-info is-medium link-paginas">Notas Fiscais</router-link>
                     <router-link :to="{}" class="button is-info is-medium link-paginas">Relatórios</router-link>

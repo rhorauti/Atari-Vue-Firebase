@@ -302,7 +302,7 @@ function limparRegistro() {
 
 
 .container-principal-clientes {
-    height: 100vh;
+    height: 90vh;
 }
 
 td, th {

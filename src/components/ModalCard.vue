@@ -16,7 +16,8 @@ defineEmits(['closeModalCard'])
 <style>
 
 .modal-card-head {
-    border-radius: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }
     
 </style>

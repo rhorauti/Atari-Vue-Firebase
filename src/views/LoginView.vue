@@ -157,7 +157,7 @@ function redefinirSenha() {
         padding: 2rem;
         width: 23rem;
         height: 31rem;
-        background-color: black;
+        background-color: #aaa7b8;
         opacity: 0.1;
         border-radius: 2rem;
         z-index: 0;
@@ -273,8 +273,8 @@ function redefinirSenha() {
 
 <div v-show="isUsuarioCriado" class="has-text-centered caixa-mensagem-validacao">
     <p class="is-size-5 has-text-light">Email criado: <span class="has-text-weight-bold has-text-light">{{ storeUsers.user.email }}</span></p>
-    <p class="is-size-6 has-text-danger mt-3 mr-3 mb-2">Seu e-mail não está validado!</p>
-    <p class="is-size-6 has-text-danger mr-3 mb-3">Clique no botão baixo para enviarmos um e-mail de validação.</p>
+    <p class="is-size-6 has-text-danger-light mt-3 mr-3 mb-2">Seu e-mail não está validado!</p>
+    <p class="is-size-6 has-text-danger-light mr-3 mb-5 is-underlined">Clique no botão abaixo para enviarmos um e-mail de validação.</p>
     <button @click="validarEmail()" class="button is-info is-medium">Validar e-mail</button>
 </div>
     
