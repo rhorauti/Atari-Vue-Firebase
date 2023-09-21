@@ -3,24 +3,33 @@
 import { useStoreUsers } from '@/stores/UserStore'
 import { auth } from '@/firebase'
 import { signOut } from 'firebase/auth'
-import { Loading, Notify } from 'notiflix'
+import { Loading, Notify, Confirm } from 'notiflix'
 import { useRouter } from 'vue-router'
  
 const userStore = useStoreUsers();
 const router = useRouter();
 
 function fazerLogOut() {
-  Loading.pulse();
-  signOut(auth).then(() => {
-    userStore.user.email = "";
-    userStore.userState.isLogado = false;
-    router.push({name: 'Login'});
-    Notify.success('Logout realizado com sucesso!');
-  }).catch(() => {
-    Notify.failure('Erro ao fazer o logout');
-  }).finally(() => {
-    Loading.remove();
-  })
+  Confirm.show(
+    'Logout',
+    'Deseja sair do sistema?',
+    'Sim',
+    'Não',
+    () => {
+      Loading.pulse();
+      signOut(auth).then(() => {
+        userStore.user.email = "";
+        userStore.userState.isLogado = false;
+        router.push({name: 'Login'});
+        Notify.success('Logout realizado com sucesso!');
+      }).catch(() => {
+        Notify.failure('Erro ao fazer o logout');
+      }).finally(() => {
+        Loading.remove();
+      })
+    }
+  )
+  
 }
 
 </script>
