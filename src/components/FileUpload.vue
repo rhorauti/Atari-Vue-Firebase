@@ -1,39 +1,63 @@
 <script setup>
 
-import { ref, defineProps, defineEmits } from 'vue';
+import { ref, defineProps, defineEmits, computed } from 'vue';
 
 const props = defineProps({
+    fileDownloadUrl: String,
+    fileUploadUrlClear: String,
     btnNome: {type: String, default: 'Upload'},
     containerFileUploadClass: {type: String, default: 'column is-5 mx-2 mb-2'}
 })
 
-const emit = defineEmits(['fileUpload', 'fileUploadName', 'fileUploadType']);
+const emit = defineEmits(['fileUpload', 'fileUploadName', 'limparArquivo']);
 
 const fileUpload = ref('');
 const fileUploadName = ref('');
 const fileUploadType = ref('');
+const fileUploadUrl = ref(props.fileUploadUrlClear);
+
+// watch(props.fileUploadClear, (newValue) => {
+//     fileUploadUrl.value = newValue;
+// });
 
 function lerFileUpload(event) {
     const file = event.target.files[0];
+    console.log(file)
     if(file) {
+        fileUpload.value = file;
         fileUploadName.value = file.name;
         fileUploadType.value = file.type;
-        const reader = new FileReader();
+        let reader = new FileReader();
         reader.onload = (event) => {
-            fileUpload.value = event.target.result;
+            fileUploadUrl.value = event.target.result
+            console.log(fileUploadUrl.value)
+            
             emit('fileUpload', fileUpload.value);
             emit('fileUploadName', fileUploadName.value);
-            emit('fileUploadType', fileUploadType.value);
         }
         reader.readAsDataURL(file);
     }
 }
 
 function limparFileUpload() {
-    fileUpload.value = null;
-    fileUploadName.value = null;
-    fileUploadType.value = null;
+    fileUpload.value = '';
+    fileUploadName.value = '';
+    fileUploadType.value = '';
+    fileUploadUrl.value = '';
+    emit('limparArquivoDownload')
 }
+
+const mostrarFotoProduto = computed(() => {
+    if((fileUploadUrl.value == null || fileUploadUrl.value == '')  && (props.fileDownloadUrl == '' || props.fileDownloadUrl == null)) {
+        return '/img/sem-imagem.png';
+    } else if((fileUploadUrl.value != null || fileUploadUrl.value != '') && fileUploadType.value == 'application/pdf') {
+        return '/img/pdf.png';
+    } else if((fileUploadUrl.value != null || fileUploadUrl.value != '') && (props.fileDownloadUrl == '' || props.fileDownloadUrl == null)) {
+        return fileUploadUrl.value;
+    } else {
+        return props.fileDownloadUrl;
+    }
+})
 
 </script>
 
@@ -55,9 +79,7 @@ function limparFileUpload() {
         <font-awesome-icon :icon="['fa', 'fa-trash']" />
     </span>
     <figure class="image is-128x128 is-align-items-center is-flex is-justify-content-center mb-2 mx-auto">
-        <img v-show="fileUploadType == 'image/jpeg'|| fileUploadType == 'image/png'" :src="fileUpload" alt="" style="height: 100%;">
-        <img v-show="fileUploadType == 'application/pdf'" src="../img/pdf.png" alt="" style="height: 100%;">
-        <img v-show="!fileUpload" src="../img/sem-imagem.png" alt="" style="height: 100%;">
+        <img :src="mostrarFotoProduto" alt="" style="height: 100%;">
     </figure>
     <div class="file">
         <label class="file-label" style="width: 100%;">

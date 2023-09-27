@@ -72,7 +72,7 @@ function fazerLogOut() {
   <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
     <div class="navbar-brand">
       <router-link :to="{name: 'Home'}" class="navbar-item">
-        <img src="@/img/logo.png" width="30">
+        <img src="/img/logo.png" width="30">
       </router-link>
       <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbar-atari">
         <span aria-hidden="true"></span>

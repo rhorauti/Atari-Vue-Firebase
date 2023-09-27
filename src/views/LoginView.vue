@@ -193,7 +193,7 @@ function redefinirSenha() {
 <div v-show="!isUsuarioCriado" id="container-principal-login-form">
     <div id="background-login"></div>
     <div>
-        <img src="../img/logo.png" alt="" width="50">
+        <img src="/img/logo.png" alt="" width="50">
     </div>
     <div class="field login-form" style="width: 17rem;">
         <label for="" class="label has-text-centered has-text-light is-size-5">{{ (!isNovoUsuario) ? 'Login' : 'Novo Usuário' }}</label>

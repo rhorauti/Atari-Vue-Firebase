@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { useStoreUsers } from '@/stores/UserStore'
+import { Notify } from 'notiflix';
 
 const routes = [
   {
@@ -62,6 +63,12 @@ router.beforeEach((to, from, next) => {
   } else {
     next();
   }
+});
+
+router.onError(() => {
+  Notify.failure("Página inválida", "Erro ao carregar o conteúdo...", "Fechar", () => {
+    window.location.reload();
+  });
 });
 
 export default router
