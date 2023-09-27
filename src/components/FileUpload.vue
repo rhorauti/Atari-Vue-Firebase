@@ -4,7 +4,6 @@ import { ref, defineProps, defineEmits, computed } from 'vue';
 
 const props = defineProps({
     fileDownloadUrl: String,
-    fileUploadUrlClear: String,
     btnNome: {type: String, default: 'Upload'},
     containerFileUploadClass: {type: String, default: 'column is-5 mx-2 mb-2'}
 })
@@ -14,11 +13,7 @@ const emit = defineEmits(['fileUpload', 'fileUploadName', 'limparArquivo']);
 const fileUpload = ref('');
 const fileUploadName = ref('');
 const fileUploadType = ref('');
-const fileUploadUrl = ref(props.fileUploadUrlClear);
-
-// watch(props.fileUploadClear, (newValue) => {
-//     fileUploadUrl.value = newValue;
-// });
+const fileUploadUrl = ref('');
 
 function lerFileUpload(event) {
     const file = event.target.files[0];
@@ -84,7 +79,7 @@ const mostrarFotoProduto = computed(() => {
     <div class="file">
         <label class="file-label" style="width: 100%;">
             <input class="file-input" type="file" name="file-upload" accept="image/jpeg, image/png, application/pdf" id="file-upload-input" @change="lerFileUpload($event)">
-            <span v-show="!fileUpload" class="file-cta button is-info" style="width: 100%;">
+            <span v-show="!fileUpload && !fileDownloadUrl" class="file-cta button is-info" style="width: 100%;">
                 <span class="file-icon">
                     <font-awesome-icon :icon="['fa', 'file-arrow-up']" />
                 </span>
@@ -93,9 +88,9 @@ const mostrarFotoProduto = computed(() => {
         </label>
         
     </div>
-    <p v-show="fileUpload" class="has-text-centered">
+    <p v-show="fileUpload || fileDownloadUrl" class="has-text-centered">
         <span class="icon mr-1"><font-awesome-icon :icon="['fa', 'file']" /></span>
-        <span>{{ fileUploadName }}</span>
+        <span>{{ (fileUploadName) ? fileUploadName : 'firebase url' }}</span>
     </p>
 </div>
 

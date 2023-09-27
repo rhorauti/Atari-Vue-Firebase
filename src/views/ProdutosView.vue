@@ -43,8 +43,6 @@ const modalProduto = ref({
     comentario: ''
 })
 
-const fileUploadUrlClear = ref('');
-
 const selectCentroCustoValue = ref(['CC 1', 'CC 2']);
 const selectNcmValue = ref(['NCM 1', 'NCM 2']);
 const selectUnidadeValue = ref(['PC', 'L'])
@@ -81,9 +79,11 @@ const isModalProdutoAtivo = ref(false);
 const tituloFormulario = ref('');
 const mostrarBtnAdicionar = ref(true);
 
+const indexFileUpdate = ref(0)
+
 function abrirModalProduto() {
+    indexFileUpdate.value++;
     modalProduto.value = {};
-    fileUploadUrlClear.value = '/img/sem-imagem.png';
     tituloFormulario.value = 'Cadastrar Novo Produto';
     isModalProdutoAtivo.value = true;    
 }
@@ -111,6 +111,7 @@ function limparModal() {
 
 function cancelarModal() {
     isModalProdutoAtivo.value = false;
+
 }
 
 function adicionarRegistro() {
@@ -183,10 +184,10 @@ function excluirRegistro(produto) {
 
 function abrirModalAlterar(produto) {
     Loading.pulse();
+    indexFileUpdate.value++;
     limparFileDownload();
     getDownloadURL(firebaseRef(storage, `/produtos-compras/${String(produto.id)}`)).then((url) => {
             modalProduto.value.fileDownloadUrl = url;
-            console.log(modalProduto.value.fileDownloadUrl)
     }).finally(() => {
         tituloFormulario.value = "Alterar Dados do Produto";
         mostrarBtnAdicionar.value = false
@@ -425,7 +426,7 @@ li.is-active {
                             @fileUploadName="ReceberEmitFileUploadName($event)"
                             @limparArquivoDownload="limparFileDownload()"
                             :fileDownloadUrl="modalProduto.fileDownloadUrl"
-                            :fileUploadUrlClear="fileUploadUrlClear">
+                            :key="indexFileUpdate">
                 </FileUpload>
                 <div class="column box mx-2 mb-2">
                     <textarea class="textarea" placeholder="Comentários do produto" v-model="modalProduto.comentario" style="height: 100%; margin-top: 0;"></textarea>
