@@ -5,7 +5,7 @@
     const props = defineProps({
         ispopUpConfirmationAtivo: Boolean,
         titlePopUpConfirmation: {type: String, default: null},
-        popUpWidth: {type: Number, default: 40}
+        popUpWidth: {type: Number}
     });
 
 </script>

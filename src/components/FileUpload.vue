@@ -8,7 +8,7 @@ const props = defineProps({
     containerFileUploadClass: {type: String, default: 'column is-5 mx-2 mb-2'}
 })
 
-const emit = defineEmits(['fileUpload', 'fileUploadName', 'limparArquivo']);
+const emit = defineEmits(['fileUpload', 'fileUploadName', 'fileUploadType', 'limparArquivo', 'mostrarFotoProduto']);
 
 const fileUpload = ref('');
 const fileUploadName = ref('');
@@ -17,7 +17,6 @@ const fileUploadUrl = ref('');
 
 function lerFileUpload(event) {
     const file = event.target.files[0];
-    console.log(file)
     if(file) {
         fileUpload.value = file;
         fileUploadName.value = file.name;
@@ -25,10 +24,9 @@ function lerFileUpload(event) {
         let reader = new FileReader();
         reader.onload = (event) => {
             fileUploadUrl.value = event.target.result
-            console.log(fileUploadUrl.value)
-            
             emit('fileUpload', fileUpload.value);
             emit('fileUploadName', fileUploadName.value);
+            emit('fileUploadName', fileUploadType.value);
         }
         reader.readAsDataURL(file);
     }
@@ -44,12 +42,16 @@ function limparFileUpload() {
 
 const mostrarFotoProduto = computed(() => {
     if((fileUploadUrl.value == null || fileUploadUrl.value == '')  && (props.fileDownloadUrl == '' || props.fileDownloadUrl == null)) {
+        emit('mostrarFotoProduto', '/img/sem-imagem.png');
         return '/img/sem-imagem.png';
     } else if((fileUploadUrl.value != null || fileUploadUrl.value != '') && fileUploadType.value == 'application/pdf') {
+        emit('mostrarFotoProduto', 'application/pdf');
         return '/img/pdf.png';
     } else if((fileUploadUrl.value != null || fileUploadUrl.value != '') && (props.fileDownloadUrl == '' || props.fileDownloadUrl == null)) {
+        emit('mostrarFotoProduto', fileUploadUrl.value);
         return fileUploadUrl.value;
     } else {
+        emit('mostrarFotoProduto', props.fileDownloadUrl);
         return props.fileDownloadUrl;
     }
 })
